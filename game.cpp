@@ -120,12 +120,19 @@ void Title::handle_events(sf::Window &window)
         {
             case sf::Event::Closed:
                 window.close();
+                set_next_state(STATE_EXIT);
                 break;
             case sf::Event::KeyPressed:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
                     set_next_state(STATE_OVERWORLD);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+                {
+                    set_next_state(STATE_EXIT);
+                    window.close();
+                }
                 break;
         }
+
 
     }
 }
@@ -196,8 +203,7 @@ OverWorld::OverWorld(int prevState)
     entity.setFillColor(sf::Color::Red);
 
     //box2d world stuff
-    sf::Vector2f grav = pixels_to_meters(0,-9.8); // earth is -9.8;
-    b2Vec2 gravity(grav.x, grav.y);
+    b2Vec2 gravity(0, -9.8); // earth gravity is -9.8
     world = new b2World(gravity); // second bool sleep argument defaults to true in 2.2.1+
 
     // box2d ground body stuff
@@ -253,7 +259,15 @@ void OverWorld::handle_events(sf::Window &window)
         {
             case sf::Event::Closed:
                 window.close();
+                set_next_state(STATE_EXIT);
                 break;
+        }
+
+        // handle quit event
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            set_next_state(STATE_TITLE);
+            //window.close();
         }
     }
 }
