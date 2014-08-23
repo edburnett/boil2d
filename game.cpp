@@ -2,8 +2,23 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
+#include <Box2D/Box2D.h>
 #include <iostream>
 #include <string>
+
+
+sf::Vector2f meters_to_pixels(float xMeters, float yMeters)
+{
+    // assumes conversion rate of 50 pixels per meter
+    return sf::Vector2f(50.0f * xMeters, 50.0f * yMeters);
+}
+
+sf::Vector2f pixels_to_meters(float xPixels, float yPixels)
+{
+    // assumes conversion rate of 50 pixels per meter
+    return sf::Vector2f(50.0f * xPixels, 50.0f * yPixels);
+}
 
 enum GameStates
 {
@@ -18,8 +33,8 @@ class GameState
 {
     public:
         virtual void handle_events(sf::Window &window) = 0;
-        virtual void logic() = 0;
-        virtual void render() = 0;
+        virtual void logic(b2World* world, b2Body* body, sf::RectangleShape& entity) = 0;
+        virtual void render(sf::RenderTarget &window, sf::RectangleShape& entity) = 0;
         virtual ~GameState(){};
 };
 
@@ -55,6 +70,8 @@ class Title : public GameState
     private:
         // title screen background
         // title screen text/message
+        sf::Font font;
+        sf::Text text;
 
     public:
         // loads title screen resources
@@ -64,8 +81,8 @@ class Title : public GameState
 
         // main loop functions
         void handle_events(sf::Window &window);
-        void logic();
-        void render();
+        void logic(b2World* world, b2Body* body, sf::RectangleShape& entity);
+        void render(sf::RenderTarget &window, sf::RectangleShape& entity);
 };
 
 Title::Title()
@@ -73,6 +90,20 @@ Title::Title()
     // load the background
 
     // setup/render the intro message
+    if (!font.loadFromFile("LeagueGothic-Regular.otf"))
+    {
+        std::cout << "Can't load font" << std::endl;
+    }
+
+    // setup text
+    //sf::Text text;
+    text.setFont(font);
+    text.setString("HELL AND EARTH");
+    text.setCharacterSize(100);
+    text.setColor(sf::Color::White);
+    sf::FloatRect bounds = text.getLocalBounds();
+    text.setOrigin(bounds.width/2, bounds.height/2);
+    text.setPosition((800 - text.getScale().x) / 2, (420 - text.getScale().y) / 2 - 100);
 }
 
 Title::~Title()
@@ -99,22 +130,28 @@ void Title::handle_events(sf::Window &window)
     }
 }
 
-void Title::logic()
+void Title::logic(b2World* world, b2Body* body, sf::RectangleShape& entity)
 {
 
 }
 
-void Title::render()
+void Title::render(sf::RenderTarget &window, sf::RectangleShape& entity)
 {
     // show the background
     // show the message
+    window.clear();
+    window.draw(text);
 }
 
 class OverWorld : public GameState
 {
-    //private:
+    private:
         // dimensions
         // background
+
+        sf::RectangleShape grnd;
+        sf::RectangleShape bob;
+        
 
     public:
         // load resources, init objects
@@ -124,8 +161,8 @@ class OverWorld : public GameState
 
         // main loop functions
         void handle_events(sf::Window &window);
-        void logic();
-        void render();
+        void logic(b2World* world, b2Body* body, sf::RectangleShape& entity);
+        void render(sf::RenderTarget &window, sf::RectangleShape& entity);
 };
 
 OverWorld::OverWorld(int prevState)
@@ -135,6 +172,12 @@ OverWorld::OverWorld(int prevState)
     // set some objects
 
     // set starting points based on previous state
+    // ground shape
+    grnd.setSize(sf::Vector2f(800,20));
+    grnd.setPosition(0,400);
+    grnd.setFillColor(sf::Color::Cyan);
+
+
 
     std::cout << "loading overworld" << std::endl;
 }
@@ -162,16 +205,27 @@ void OverWorld::handle_events(sf::Window &window)
     }
 }
 
-void OverWorld::logic()
+void OverWorld::logic(b2World* world, b2Body* body, sf::RectangleShape& entity)
 {
     // do logic, collision checks, etc
+    entity.setRotation(body->GetAngle() * (180/3.14159265359));
+    sf::Vector2f body_pos = meters_to_pixels(body->GetPosition().x, -body->GetPosition().y);
+    //sf::Vector2f grnd_pos = meters_to_pixels(grnd.GetPosition().x, -grnd.GetPosition().y);
+    //std::cout << pos.x << " " << pos.y << std::endl;
+    entity.setPosition(body_pos.x, body_pos.y);
+    //grnd.setPosition(grnd_pos.x, grnd_pos.y);
+    
 
     // move the player etc
 }
 
-void OverWorld::render()
+void OverWorld::render(sf::RenderTarget &window, sf::RectangleShape& entity)
 {
     // render bg, objects, player, etc
+    window.clear();
+
+    window.draw(grnd);
+    window.draw(entity);
 }
         
 
@@ -220,11 +274,11 @@ void clean_up()
 int main()
 {
     // init, load files, etc
-    sf::RenderWindow window(sf::VideoMode(1024,768), "LD30");
-    window.setFramerateLimit(120);
+    sf::RenderWindow window(sf::VideoMode(800,420), "LD30");
+    window.setFramerateLimit(240);
 
-    // 20 updates per second
-    sf::Uint32 mUpdateRate = (1000.0f / 30.0f);
+    // 60 updates per second - minimum recommended for box2d
+    sf::Uint32 mUpdateRate = (1000.0f / 60.0f);
     // max updates
     const int mMaxUpdates = 5;
     // Clock used in restricting Update loop to a fixed rate
@@ -244,6 +298,71 @@ int main()
     stateID = STATE_TITLE;
     currentState = new Title();
 
+    //box2d world stuff
+    sf::Vector2f grav = pixels_to_meters(0,-0.1); // earth is -9.8;
+    b2Vec2 gravity(grav.x, grav.y);
+    b2World* world = new b2World(gravity); // second bool sleep argument defaults to true in 2.2.1+
+
+    // box2d ground body stuff
+    b2BodyDef groundBodyDef;
+    sf::Vector2f gb_pos = pixels_to_meters(0,-400);
+    groundBodyDef.position.Set(gb_pos.x, gb_pos.y);
+    b2Body* groundBody = world->CreateBody(&groundBodyDef);
+
+    b2PolygonShape groundBox;
+    sf::Vector2f gb_scale = pixels_to_meters(800,-10); // should maybe be -10?
+    groundBox.SetAsBox(gb_scale.x, gb_scale.y);
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // box2d dynamic body
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    sf::Vector2f db_pos = pixels_to_meters(0,0);
+    bodyDef.position.Set(db_pos.x, db_pos.y);
+    b2Body* body = world->CreateBody(&bodyDef);
+
+    b2PolygonShape dynamicBox;
+    sf::Vector2f db_size = pixels_to_meters(20,20);
+    dynamicBox.SetAsBox(db_size.x, db_size.y);
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+    body->CreateFixture(&fixtureDef);
+
+    // box2d timestep values
+    float32 timeStep = 1.0f / 60.0f;
+    int32 velocityIterations = 8;
+    int32 positionIterations = 2;
+
+    // entity shape
+    sf::RectangleShape entity(sf::Vector2f(20,20));
+    entity.setFillColor(sf::Color::Red);
+
+
+
+
+
+
+    /*
+    b2BodyDef myBodyDef;
+    myBodyDef.type = b2_dynamicBody;
+    myBodyDef.position.Set(0,20);
+    myBodyDef.angle = 0;
+    b2Body* dynamicBody = myWorld->CreateBody(&myBodyDef);
+
+    // box2d fixture stuff
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox(1,1);
+    b2FixtureDef boxFixtureDef;
+    boxFixtureDef.shape = &boxShape;
+    boxFixtureDef.density = 1;
+    dynamicBody->CreateFixture(&boxFixtureDef);
+    */
+
+
+
+
     // main loop here
     while(stateID != STATE_EXIT)
     {
@@ -259,7 +378,16 @@ int main()
         // handle logic
         while((anUpdateTime - anUpdateNext) >= mUpdateRate && anUpdates++ < mMaxUpdates)
         {
-            currentState->logic();
+            // box2d updates
+            world->Step(timeStep, velocityIterations, positionIterations);
+            b2Vec2 position = body->GetPosition();
+            float32 angle = body->GetAngle();
+            std::cout << position.x << " " << position.y << " " << angle << std::endl;
+            
+            // update state logic
+            currentState->logic(world, body, entity);
+
+            // increment the fixed time step bullshit
             anUpdateNext += mUpdateRate;
         }
 
@@ -267,7 +395,7 @@ int main()
         change_state();
 
         // render the state
-        currentState->render();
+        currentState->render(window, entity);
 
         // update screen
         window.display();
