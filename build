@@ -1,0 +1,1 @@
+g++ -c -std=c++11 game.cpp && g++ game.o -o game -lsfml-graphics -lGL -lsfml-window -lsfml-system && ./game
