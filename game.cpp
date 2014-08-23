@@ -305,12 +305,13 @@ int main()
 
     // box2d ground body stuff
     b2BodyDef groundBodyDef;
+    groundBodyDef.type = b2_staticBody;
     sf::Vector2f gb_pos = pixels_to_meters(0,-400);
     groundBodyDef.position.Set(gb_pos.x, gb_pos.y);
     b2Body* groundBody = world->CreateBody(&groundBodyDef);
 
     b2PolygonShape groundBox;
-    sf::Vector2f gb_scale = pixels_to_meters(800,-10); // should maybe be -10?
+    sf::Vector2f gb_scale = pixels_to_meters(400,-10); // should maybe be -10?
     groundBox.SetAsBox(gb_scale.x, gb_scale.y);
     groundBody->CreateFixture(&groundBox, 0.0f);
 
