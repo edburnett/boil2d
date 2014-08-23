@@ -17,7 +17,7 @@ sf::Vector2f meters_to_pixels(float xMeters, float yMeters)
 sf::Vector2f pixels_to_meters(float xPixels, float yPixels)
 {
     // assumes conversion rate of 50 pixels per meter
-    return sf::Vector2f(50.0f * xPixels, 50.0f * yPixels);
+    return sf::Vector2f(0.02f * xPixels, 0.02f * yPixels);
 }
 
 enum GameStates
@@ -191,9 +191,12 @@ OverWorld::OverWorld(int prevState)
     grnd.setPosition(0,400);
     grnd.setFillColor(sf::Color::Cyan);
 
+    // entity shape
+    entity.setSize(sf::Vector2f(20,40));
+    entity.setFillColor(sf::Color::Red);
 
     //box2d world stuff
-    sf::Vector2f grav = pixels_to_meters(0,-0.1); // earth is -9.8;
+    sf::Vector2f grav = pixels_to_meters(0,-9.8); // earth is -9.8;
     b2Vec2 gravity(grav.x, grav.y);
     world = new b2World(gravity); // second bool sleep argument defaults to true in 2.2.1+
 
@@ -202,7 +205,7 @@ OverWorld::OverWorld(int prevState)
     groundBodyDef.position.Set(gb_pos.x, gb_pos.y);
     b2Body* groundBody = world->CreateBody(&groundBodyDef);
 
-    sf::Vector2f gb_scale = pixels_to_meters(400,-10); // should maybe be -10?
+    sf::Vector2f gb_scale = pixels_to_meters(400,-1);
     groundBox.SetAsBox(gb_scale.x, gb_scale.y);
     groundBody->CreateFixture(&groundBox, 0.0f);
 
@@ -212,7 +215,7 @@ OverWorld::OverWorld(int prevState)
     bodyDef.position.Set(db_pos.x, db_pos.y);
     body = world->CreateBody(&bodyDef);
 
-    sf::Vector2f db_size = pixels_to_meters(20,20);
+    sf::Vector2f db_size = pixels_to_meters(20,40);
     dynamicBox.SetAsBox(db_size.x, db_size.y);
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0f;
@@ -224,9 +227,7 @@ OverWorld::OverWorld(int prevState)
     velocityIterations = 8;
     positionIterations = 2;
 
-    // entity shape
-    entity.setSize(sf::Vector2f(20,20));
-    entity.setFillColor(sf::Color::Red);
+
 
 
 
