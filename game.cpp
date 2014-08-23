@@ -161,6 +161,7 @@ class OverWorld : public GameState
         b2PolygonShape groundBox; // gound fixture
         b2BodyDef bodyDef; // dynamic body
         b2PolygonShape dynamicBox; // dynamic fixture
+        b2FixtureDef fixtureDef;
         float32 timeStep;
         int32 velocityIterations;
         int32 positionIterations;
@@ -213,7 +214,6 @@ OverWorld::OverWorld(int prevState)
 
     sf::Vector2f db_size = pixels_to_meters(20,20);
     dynamicBox.SetAsBox(db_size.x, db_size.y);
-    b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.3f;
