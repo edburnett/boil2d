@@ -7,6 +7,9 @@
 #include <iostream>
 #include <string>
 
+// this test is inspired a combination of GQE, Lazyfoo State Machine, and 
+// gaffer's fixed timestep article
+
 
 sf::Vector2f meters_to_pixels(float xMeters, float yMeters)
 {
@@ -34,7 +37,7 @@ class GameState
     public:
         virtual void handle_events(sf::Window &window) = 0;
         virtual void logic() = 0;
-        virtual void render(sf::RenderTarget &window, float& interpolation) = 0;
+        virtual void render(sf::RenderTarget &window, double& alpha) = 0;
         virtual ~GameState(){};
 };
 
@@ -82,7 +85,7 @@ class Title : public GameState
         // main loop functions
         void handle_events(sf::Window &window);
         void logic();
-        void render(sf::RenderTarget &window, float& interpolation);
+        void render(sf::RenderTarget &window, double& alpha);
 };
 
 Title::Title()
@@ -142,7 +145,7 @@ void Title::logic()
 
 }
 
-void Title::render(sf::RenderTarget &window, float& interpolation)
+void Title::render(sf::RenderTarget &window, double& alpha)
 {
     // show the background
     // show the message
@@ -178,6 +181,12 @@ class OverWorld : public GameState
         float player_vel_x;
         float player_vel_y;
 
+        // the curerent and previous position/angle/etc of the player goes here?
+        sf::Vector2f prevPosition;
+        sf::Vector2f curPosition;
+        float pos_x;
+        float pos_y;
+
 
     public:
         // load resources, init objects
@@ -188,7 +197,7 @@ class OverWorld : public GameState
         // main loop functions
         void handle_events(sf::Window &window);
         void logic();
-        void render(sf::RenderTarget &window, float& interpolation);
+        void render(sf::RenderTarget &window, double& alpha);
 };
 
 OverWorld::OverWorld(int prevState)
@@ -199,13 +208,14 @@ OverWorld::OverWorld(int prevState)
 
 
     // ground shape
-    grnd.setSize(sf::Vector2f(800,20));
+
     grnd.setPosition(0,400);
+    grnd.setSize(sf::Vector2f(800,20));
     grnd.setFillColor(sf::Color::Cyan);
 
     // entity shape
-    player_pos_x = 100.0f;
-    player_pos_y = 0.0f;
+    player_pos_x = 100.0;
+    player_pos_y = 0.0;
     entity.setPosition(player_pos_x,player_pos_y);
     entity.setSize(sf::Vector2f(20,40));
     entity.setFillColor(sf::Color::Red);
@@ -280,42 +290,47 @@ void OverWorld::handle_events(sf::Window &window)
 void OverWorld::logic()
 {
 
-    // box2d updates
+    
+    // get previous player position
+    prevPosition = meters_to_pixels(body->GetPosition().x, body->GetPosition().y);
+    
+    // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);
 
-    // entity updates
+    // get new player position
+    curPosition = meters_to_pixels(body->GetPosition().x, body->GetPosition().y);
+
     //entity.setRotation(body->GetAngle() * (180/3.14159265359));
-    sf::Vector2f body_pos = meters_to_pixels(body->GetPosition().x, -body->GetPosition().y);
-    //entity.setPosition(body_pos.x, body_pos.y);
-    //player_pos_x = body->GetPosition().x;
-    //player_pos_y = body->GetPosition().y;
-    player_pos_x = body_pos.x;
-    player_pos_y = body_pos.y;
-
-    //b2Vec2 vel = body->GetLinearVelocity();
-    //sf::Vector2f body_vel = meters_to_pixels(vel.x, -vel.y);
-    //player_vel_x = body_vel.x;
-    //player_vel_y = body_vel.y;
-
 
     // do logic, collision checks, etc
 
     // move the player etc
 }
 
-void OverWorld::render(sf::RenderTarget& window, float& interpolation)
+void OverWorld::render(sf::RenderTarget& window, double& alpha)
 {
 
+    // clear screen and box2d force cache
     world->ClearForces();
-    // render bg, objects, player, etc
     window.clear();
 
+    // draw the ground body
     window.draw(grnd);
 
-    //entity.setPosition(player_pos_x + (player_vel_x * interpolation), player_pos_y + (player_vel_y * interpolation));
-    // TODO try interpolating again except using the prev position instead of the new one?
-    // TODO try fix your timestep style instead of dewitters?
-    entity.setPosition(player_pos_x, player_pos_y);
+    // convert meters to pixels
+    //sf::Vector2f fixed_cur_pos  = meters_to_pixels(curPosition.x, curPosition.y);
+    //sf::Vector2f fixed_prev_pos = meters_to_pixels(prevPosition.x, prevPosition.y);
+    
+    // get the interpolated positions
+    //pos_x = fixed_cur_pos.x * alpha + fixed_prev_pos.x * (1.0f - alpha);
+    //pos_y = fixed_cur_pos.y * alpha + fixed_prev_pos.y * (1.0f - alpha);
+
+    pos_x = curPosition.x * alpha + prevPosition.x * (1.0f - alpha);
+    pos_y = curPosition.y * alpha + prevPosition.y * (1.0f - alpha);
+
+    // position and draw the player
+    //entity.setPosition(pos_x, pos_y);
+    entity.setPosition(pos_x, -pos_y);
     window.draw(entity);
 }
         
@@ -370,21 +385,16 @@ int main()
     window.setFramerateLimit(240);
     window.setVerticalSyncEnabled(false);
 
-    // 60 updates per second - minimum recommended for box2d
-    const float mUpdateRate = (1000000.0f / 60.0f); // increasing this makes things smoother
-    // max updates
-    const int mMaxUpdates = 5;
-    // Count the number of sequential UpdateFixed loop calls
-    sf::Uint32 anUpdates;
-    // Clock used in restricting Update loop to a fixed rate
-    sf::Clock anUpdateClock;
-    // Clock used in calculating the time elapsed since the last frame
-    sf::Clock anFrameClock;
-    // Restart/Reset our Update clock
-    //anUpdateClock.restart();
-    // When do we need to update next (in milliseconds)?
-    sf::Int32 anUpdateNext = anUpdateClock.getElapsedTime().asMicroseconds();
-    float interpolation = 0.0;
+    // gaffer loop time stuff
+    sf::Clock clock;
+
+    double t = 0.0f;
+    //double dt = 0.01f;
+    double dt = 1.0f / 60.0f;
+    double alpha;
+
+    double currentTime = clock.getElapsedTime().asSeconds();
+    double accumulator = 0.0f;
 
     // get a clock for calculating fps
     sf::Clock fps_clock;
@@ -398,44 +408,47 @@ int main()
     // main loop here
     while(stateID != STATE_EXIT)
     {
-        // make note of the current update time
-        sf::Int32 anUpdateTime = anUpdateClock.getElapsedTime().asMicroseconds();
+        double newTime = clock.getElapsedTime().asSeconds();
+        double frameTime = newTime - currentTime;
+
+        if (frameTime > 0.25)
+            frameTime = 0.25;
+
+        currentTime = newTime;
+        accumulator += frameTime;
 
         // handle events
         currentState->handle_events(window);
 
-        // handle logic
-        anUpdates = 0;
-        while((anUpdateTime - anUpdateNext) >= mUpdateRate && anUpdates++ < mMaxUpdates)
+        // fixed timestep update loop
+        while ( accumulator >= dt )
         {
-            // update state logic
-            currentState->logic(); // moving this outside the loop makes it smooth - why?
+            // do logic for current state
+            currentState->logic();
 
-            // increment the fixed time step bullshit
-            anUpdateNext += mUpdateRate;
+            // increment time
+            t += dt;
+
+            // decrement accumulator
+            accumulator -= dt;
         }
 
-
-        //currentState->logic(); // moving this outside the loop makes it smooth - why?
-
-        // get value for interpolation
-        interpolation = float(anUpdateTime + mMaxUpdates - anUpdateNext) / float(mMaxUpdates);
+        // get the alpha
+        alpha = accumulator / dt;
 
         // change state if needed
         change_state();
 
         // render the state
-        currentState->render(window, interpolation);
+        currentState->render(window, alpha);
 
         // update screen
         window.display();
 
-        /*
         // calculate FPS for output
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
-        std::cout << "fps: " << fps << "  anUpdateNext: " << anUpdateNext << "  anUpdates: " << anUpdates << "  interpolation: " << interpolation << std::endl;
-        */
+        //std::cout << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
 
     }
     // do cleanup
