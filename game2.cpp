@@ -178,12 +178,10 @@ class OverWorld : public GameState
 
         float player_pos_x;
         float player_pos_y;    
-        float player_vel_x;
-        float player_vel_y;
 
         // the curerent and previous position/angle/etc of the player goes here?
-        sf::Vector2f prevPosition;
-        sf::Vector2f curPosition;
+        sf::Vector2f prevPosition; // in pixels - convert this automagically?
+        sf::Vector2f curPosition;  // in pixels - convert this automagically?
         float pos_x;
         float pos_y;
 
@@ -208,7 +206,6 @@ OverWorld::OverWorld(int prevState)
 
 
     // ground shape
-
     grnd.setPosition(0,400);
     grnd.setSize(sf::Vector2f(800,20));
     grnd.setFillColor(sf::Color::Cyan);
@@ -216,6 +213,8 @@ OverWorld::OverWorld(int prevState)
     // entity shape
     player_pos_x = 100.0;
     player_pos_y = 0.0;
+    curPosition = sf::Vector2f(player_pos_x, player_pos_y);
+    prevPosition = sf::Vector2f(player_pos_x, player_pos_y);
     entity.setPosition(player_pos_x,player_pos_y);
     entity.setSize(sf::Vector2f(20,40));
     entity.setFillColor(sf::Color::Red);
@@ -317,19 +316,11 @@ void OverWorld::render(sf::RenderTarget& window, double& alpha)
     // draw the ground body
     window.draw(grnd);
 
-    // convert meters to pixels
-    //sf::Vector2f fixed_cur_pos  = meters_to_pixels(curPosition.x, curPosition.y);
-    //sf::Vector2f fixed_prev_pos = meters_to_pixels(prevPosition.x, prevPosition.y);
-    
-    // get the interpolated positions
-    //pos_x = fixed_cur_pos.x * alpha + fixed_prev_pos.x * (1.0f - alpha);
-    //pos_y = fixed_cur_pos.y * alpha + fixed_prev_pos.y * (1.0f - alpha);
-
+    // get interpolated position
     pos_x = curPosition.x * alpha + prevPosition.x * (1.0f - alpha);
     pos_y = curPosition.y * alpha + prevPosition.y * (1.0f - alpha);
 
     // position and draw the player
-    //entity.setPosition(pos_x, pos_y);
     entity.setPosition(pos_x, -pos_y);
     window.draw(entity);
 }
@@ -388,9 +379,8 @@ int main()
     // gaffer loop time stuff
     sf::Clock clock;
 
-    double t = 0.0f;
     //double dt = 0.01f;
-    double dt = 1.0f / 60.0f;
+    double dt = 1.0f / 60.0f; // this is same as timeStep
     double alpha;
 
     double currentTime = clock.getElapsedTime().asSeconds();
@@ -425,9 +415,6 @@ int main()
         {
             // do logic for current state
             currentState->logic();
-
-            // increment time
-            t += dt;
 
             // decrement accumulator
             accumulator -= dt;
