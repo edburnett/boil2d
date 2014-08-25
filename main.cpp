@@ -1,11 +1,12 @@
 #include <SFML/Window.hpp>
-#include <SFML/OpenGL.hpp>
 #include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include <iostream>
-#include <string>
+
+#include <GameState.hpp>
+#include <Title.hpp>
+#include <Overworld.hpp>
 
 // this test is inspired a combination of GQE, Lazyfoo State Machine, and 
 // gaffer's fixed timestep article
@@ -23,24 +24,6 @@ sf::Vector2f pixels_to_meters(float xPixels, float yPixels)
     return sf::Vector2f(0.02f * xPixels, 0.02f * yPixels);
 }
 
-enum GameStates
-{
-    STATE_NULL,
-    STATE_TITLE,
-    STATE_OVERWORLD,
-    STATE_EXIT,
-};
-
-// game state base class
-class GameState
-{
-    public:
-        virtual void handle_events(sf::Window &window) = 0;
-        virtual void logic() = 0;
-        virtual void render(sf::RenderTarget &window, double& alpha) = 0;
-        virtual ~GameState(){};
-};
-
 // state status manager
 void set_next_state(int newState);
 
@@ -53,6 +36,7 @@ int nextState = STATE_NULL;
 
 // game state object
 GameState *currentState = NULL;
+
 
 bool load_files()
 {
@@ -67,26 +51,6 @@ bool load_files()
 
 }
 
-// title state
-class Title : public GameState
-{
-    private:
-        // title screen background
-        // title screen text/message
-        sf::Font font;
-        sf::Text text;
-
-    public:
-        // loads title screen resources
-        Title();
-        // free resources
-        ~Title();
-
-        // main loop functions
-        void handle_events(sf::Window &window);
-        void logic();
-        void render(sf::RenderTarget &window, double& alpha);
-};
 
 Title::Title()
 {
@@ -152,51 +116,6 @@ void Title::render(sf::RenderTarget &window, double& alpha)
     window.clear();
     window.draw(text);
 }
-
-class OverWorld : public GameState
-{
-    private:
-        // dimensions
-        // background
-
-        // SFML shapes
-        sf::RectangleShape grnd;
-        sf::RectangleShape entity;
-
-        // box2d things
-
-        b2World* world; // box2d world
-        b2Body* body;
-        b2BodyDef groundBodyDef; // ground body
-        b2PolygonShape groundBox; // gound fixture
-        b2BodyDef bodyDef; // dynamic body
-        b2PolygonShape dynamicBox; // dynamic fixture
-        b2FixtureDef fixtureDef;
-        float32 timeStep;
-        int32 velocityIterations;
-        int32 positionIterations;
-
-        float player_pos_x;
-        float player_pos_y;    
-
-        // the curerent and previous position/angle/etc of the player goes here?
-        sf::Vector2f prevPosition; // in pixels - convert this automagically?
-        sf::Vector2f curPosition;  // in pixels - convert this automagically?
-        float pos_x;
-        float pos_y;
-
-
-    public:
-        // load resources, init objects
-        OverWorld(int prevState);
-        // free resources
-        ~OverWorld();
-
-        // main loop functions
-        void handle_events(sf::Window &window);
-        void logic();
-        void render(sf::RenderTarget &window, double& alpha);
-};
 
 OverWorld::OverWorld(int prevState)
 {
