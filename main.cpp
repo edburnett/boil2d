@@ -65,9 +65,9 @@ Title::Title()
     // setup text
     //sf::Text text;
     text.setFont(font);
-    text.setString("HELL AND EARTH");
-    text.setCharacterSize(100);
-    text.setColor(sf::Color::White);
+    text.setString("BOIL2D");
+    text.setCharacterSize(200);
+    text.setColor(sf::Color(35,35,35));
     sf::FloatRect bounds = text.getLocalBounds();
     text.setOrigin(bounds.width/2, bounds.height/2);
     text.setPosition((800 - text.getScale().x) / 2, (420 - text.getScale().y) / 2 - 100);
