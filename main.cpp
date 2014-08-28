@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include <iostream>
+#include <vector>
 
 #include <GameState.hpp>
 #include <Title.hpp>
@@ -77,6 +78,7 @@ Title::~Title()
 {
     // destruct background, title message
 }
+
 
 void Title::handle_events(sf::Window &window)
 {
@@ -173,11 +175,25 @@ OverWorld::OverWorld(int prevState)
     positionIterations = 3;
 }
 
+
+
 OverWorld::~OverWorld()
 {
     // free resources
     delete world;
 }
+
+/*
+void OverWorld::Pause()
+{
+    // pause the game
+}
+
+void OverWorld::Resume()
+{
+    // pause the game
+}
+*/
 
 void OverWorld::handle_events(sf::Window &window)
 {
@@ -257,6 +273,7 @@ void change_state()
 {
     if(nextState != STATE_NULL)
     {
+
         // delete current state
         if(nextState != STATE_EXIT)
             delete currentState;

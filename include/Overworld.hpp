@@ -47,6 +47,8 @@ class OverWorld : public GameState
         // main loop functions
         void handle_events(sf::Window &window);
         void logic();
+        void pause();
+        void resume();
         void render(sf::RenderTarget &window, double& alpha);
 };
 

@@ -2,6 +2,7 @@
 #define   GAMESTATE_HPP_INCLUDED
 
 #include <SFML/Window.hpp>
+#include <vector>
 
 // declare GateStates type
 enum GameStates
@@ -9,6 +10,7 @@ enum GameStates
     STATE_NULL,
     STATE_TITLE,
     STATE_OVERWORLD,
+    STATE_PAUSE,
     STATE_EXIT,
 };
 
@@ -20,6 +22,12 @@ class GameState
         virtual void logic() = 0;
         virtual void render(sf::RenderTarget &window, double& alpha) = 0;
         virtual ~GameState(){};
+
+        // put this under the App class or global scope instead?
+        std::vector<GameState*> state_stack;
+
+        void pause();
+        void resume();
 };
 
 #endif
