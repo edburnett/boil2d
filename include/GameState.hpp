@@ -23,11 +23,11 @@ class GameState
         virtual void render(sf::RenderTarget &window, double& alpha) = 0;
         virtual ~GameState(){};
 
-        // put this under the App class or global scope instead?
-        std::vector<GameState*> state_stack;
 
-        void pause();
-        void resume();
+
+        void pause_game();
+        void resume_game();
+
 };
 
 #endif

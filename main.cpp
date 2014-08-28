@@ -7,6 +7,7 @@
 
 #include <GameState.hpp>
 #include <Title.hpp>
+#include <Pause.hpp>
 #include <Overworld.hpp>
 
 // this test is inspired a combination of GQE, Lazyfoo State Machine, and 
@@ -119,6 +120,28 @@ void Title::render(sf::RenderTarget &window, double& alpha)
     window.draw(text);
 }
 
+Pause::Pause()
+{
+}
+
+Pause::~Pause()
+{
+}
+
+void Pause::logic()
+{
+}
+
+void Pause::render(sf::RenderTarget &window, double& alpha)
+{
+}
+
+void Pause::handle_events(sf::Window &window)
+{
+}
+
+
+
 OverWorld::OverWorld(int prevState)
 {
     // load the background
@@ -183,17 +206,15 @@ OverWorld::~OverWorld()
     delete world;
 }
 
-/*
-void OverWorld::Pause()
+void OverWorld::pause()
 {
     // pause the game
 }
 
-void OverWorld::Resume()
+void OverWorld::resume()
 {
     // pause the game
 }
-*/
 
 void OverWorld::handle_events(sf::Window &window)
 {
@@ -259,7 +280,8 @@ void OverWorld::render(sf::RenderTarget& window, double& alpha)
     entity.setPosition(pos_x, -pos_y);
     window.draw(entity);
 }
-        
+
+   
 
 void set_next_state(int newState)
 {
@@ -269,21 +291,26 @@ void set_next_state(int newState)
     }
 }
 
-void change_state()
+void change_state(std::vector<GameState*>& state_stack)
 {
     if(nextState != STATE_NULL)
     {
 
+        state_stack.push_back(currentState);
+
         // delete current state
-        if(nextState != STATE_EXIT)
+        if(nextState != STATE_EXIT && nextState != STATE_PAUSE)
             delete currentState;
 
         // change the state
         switch(nextState)
         {
-            //delete currentState; // TODO: should we clear out old states when switching?
             case STATE_TITLE:
                 currentState = new Title();
+                break;
+
+            case STATE_PAUSE:
+                currentState = new Pause();
                 break;
 
             case STATE_OVERWORLD:
@@ -330,6 +357,9 @@ int main()
     stateID = STATE_TITLE;
     currentState = new Title();
 
+    // init the stack
+    std::vector<GameState*> state_stack;
+
 
     // main loop here
     while(stateID != STATE_EXIT)
@@ -349,8 +379,10 @@ int main()
         // fixed timestep update loop
         while ( accumulator >= dt )
         {
-            // do logic for current state
-            currentState->logic();
+            if (stateID != STATE_PAUSE)
+                // do logic for current state
+                currentState->logic();
+
 
             // decrement accumulator
             accumulator -= dt;
@@ -360,7 +392,7 @@ int main()
         alpha = accumulator / dt;
 
         // change state if needed
-        change_state();
+        change_state(state_stack);
 
         // render the state
         currentState->render(window, alpha);
