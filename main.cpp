@@ -103,7 +103,6 @@ void Title::handle_events(sf::Window &window)
                 break;
         }
 
-
     }
 }
 
@@ -122,6 +121,9 @@ void Title::render(sf::RenderTarget &window, double& alpha)
 
 Pause::Pause()
 {
+    pause_screen.setPosition(0,0);
+    pause_screen.setSize(sf::Vector2f(800,420));
+    pause_screen.setFillColor(sf::Color::Red);
 }
 
 Pause::~Pause()
@@ -134,10 +136,19 @@ void Pause::logic()
 
 void Pause::render(sf::RenderTarget &window, double& alpha)
 {
+    window.draw(pause_screen);
 }
 
 void Pause::handle_events(sf::Window &window)
 {
+    // handle quit event
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    {
+        //set_next_state(STATE_TITLE);
+        set_next_state(STATE_OVERWORLD);
+        //window.close();
+    }
+
 }
 
 
@@ -236,7 +247,8 @@ void OverWorld::handle_events(sf::Window &window)
         // handle quit event
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         {
-            set_next_state(STATE_TITLE);
+            //set_next_state(STATE_TITLE);
+            set_next_state(STATE_PAUSE);
             //window.close();
         }
     }
@@ -296,7 +308,8 @@ void change_state(std::vector<GameState*>& state_stack)
     if(nextState != STATE_NULL)
     {
 
-        state_stack.push_back(currentState);
+        if(stateID == STATE_OVERWORLD)
+            state_stack.push_back(currentState);
 
         // delete current state
         if(nextState != STATE_EXIT && nextState != STATE_PAUSE)
@@ -314,7 +327,14 @@ void change_state(std::vector<GameState*>& state_stack)
                 break;
 
             case STATE_OVERWORLD:
-                currentState = new OverWorld(stateID);
+                if(stateID == STATE_PAUSE)
+                {
+                    currentState = state_stack.back();
+                }
+                else
+                {
+                    currentState = new OverWorld(stateID);
+                }
                 break;
         }
 

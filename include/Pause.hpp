@@ -10,6 +10,8 @@ class Pause : public GameState
         sf::Font font;
         sf::Text text;
 
+        sf::RectangleShape pause_screen;
+
     public:
         // loads title screen resources
         Pause();
