@@ -5,7 +5,10 @@
 #include <iostream>
 #include <vector>
 
+// boil2d core
 #include <GameState.hpp>
+
+// states
 #include <Title.hpp>
 #include <Pause.hpp>
 #include <Overworld.hpp>
@@ -59,7 +62,7 @@ Title::Title()
     // load the background
 
     // setup/render the intro message
-    if (!font.loadFromFile("LeagueGothic-Regular.otf"))
+    if (!font.loadFromFile("resource/fonts/LeagueGothic-Regular.otf"))
     {
         std::cout << "Can't load font" << std::endl;
     }
@@ -123,7 +126,7 @@ Pause::Pause()
 {
     pause_screen.setPosition(0,0);
     pause_screen.setSize(sf::Vector2f(800,420));
-    pause_screen.setFillColor(sf::Color::Red);
+    pause_screen.setFillColor(sf::Color(255,255,255,32));
 }
 
 Pause::~Pause()
@@ -141,12 +144,16 @@ void Pause::render(sf::RenderTarget &window, double& alpha)
 
 void Pause::handle_events(sf::Window &window)
 {
-    // handle quit event
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    sf::Event event;
+    while (window.pollEvent(event))
     {
-        //set_next_state(STATE_TITLE);
-        set_next_state(STATE_OVERWORLD);
-        //window.close();
+        // handle quit event
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            //set_next_state(STATE_TITLE);
+            set_next_state(STATE_OVERWORLD);
+            //window.close();
+        }
     }
 
 }
@@ -309,7 +316,7 @@ void change_state(std::vector<GameState*>& state_stack)
     {
 
         if(stateID == STATE_OVERWORLD)
-            state_stack.push_back(currentState);
+            state_stack.push_back(currentState); // put the current state onto the stack
 
         // delete current state
         if(nextState != STATE_EXIT && nextState != STATE_PAUSE)
@@ -330,6 +337,7 @@ void change_state(std::vector<GameState*>& state_stack)
                 if(stateID == STATE_PAUSE)
                 {
                     currentState = state_stack.back();
+                    state_stack.pop_back(); // clear the last state from the stack
                 }
                 else
                 {
@@ -377,7 +385,7 @@ int main()
     stateID = STATE_TITLE;
     currentState = new Title();
 
-    // init the stack
+    // init the state stack
     std::vector<GameState*> state_stack;
 
 
@@ -424,6 +432,8 @@ int main()
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
         //std::cout << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
+
+        std::cout << state_stack.size() << std::endl;
 
     }
     // do cleanup

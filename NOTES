@@ -1,0 +1,8 @@
+add a Game or App class which the main functions, loop reside in. This way
+we can inherit things from this base class like the window, globally-required
+objects, physics world, etc., rather than having to pass pointers all around. 
+See GQE structure. Main app class has a run() member which is the main()
+function and game loop.
+
+Create another state class layer for Level or Gameplay. Expand upon that to
+subdivide into levels, planets, rooms, etc.
