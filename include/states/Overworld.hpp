@@ -3,6 +3,7 @@
 
 #include <Box2D/Box2D.h>
 #include <SFML/System.hpp>
+#include <Functions.hpp>
 
 
 class OverWorld : public GameState
@@ -29,7 +30,7 @@ class OverWorld : public GameState
         int32 positionIterations;
 
         float player_pos_x;
-        float player_pos_y;    
+        float player_pos_y;
 
         // the curerent and previous position/angle/etc of the player goes here?
         sf::Vector2f prevPosition; // in pixels - convert this automagically?

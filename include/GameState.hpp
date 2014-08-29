@@ -4,6 +4,9 @@
 #include <SFML/Window.hpp>
 #include <vector>
 
+// state status manager
+void set_next_state(int newState);
+
 // declare GateStates type
 enum GameStates
 {
@@ -22,12 +25,6 @@ class GameState
         virtual void logic() = 0;
         virtual void render(sf::RenderTarget &window, double& alpha) = 0;
         virtual ~GameState(){};
-
-
-
-        void pause_game();
-        void resume_game();
-
 };
 
 #endif
