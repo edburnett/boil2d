@@ -11,6 +11,7 @@
 #include <Overworld.hpp>
 
 
+
 OverWorld::OverWorld(int prevState)
 {
     // load the background
@@ -65,6 +66,7 @@ OverWorld::OverWorld(int prevState)
     timeStep = 1.0f / 60.0f; 
     velocityIterations = 8;
     positionIterations = 3;
+
 }
 
 

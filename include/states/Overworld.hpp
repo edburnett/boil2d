@@ -39,6 +39,8 @@ class OverWorld : public GameState
         float pos_y;
 
 
+
+
     public:
         // load resources, init objects
         OverWorld(int prevState);
@@ -51,6 +53,7 @@ class OverWorld : public GameState
         void pause();
         void resume();
         void render(sf::RenderTarget &window, double& alpha);
+
 };
 
 #endif
