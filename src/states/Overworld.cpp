@@ -9,10 +9,11 @@
 #include <GameState.hpp>
 #include <Functions.hpp>
 #include <Overworld.hpp>
+#include <App.hpp>
 
 
 
-OverWorld::OverWorld(int prevState)
+OverWorld::OverWorld(int prevState, App* app)
 {
     // load the background
 
@@ -20,8 +21,8 @@ OverWorld::OverWorld(int prevState)
 
 
     // ground shape
-    grnd.setPosition(0,400);
-    grnd.setSize(sf::Vector2f(800,20));
+    grnd.setPosition(0,app->window_height-20);
+    grnd.setSize(sf::Vector2f(app->window_width,20));
     grnd.setFillColor(sf::Color::Cyan);
 
     // entity shape
@@ -40,11 +41,11 @@ OverWorld::OverWorld(int prevState)
     //world->SetSubStepping(true);
 
     // box2d ground body stuff
-    sf::Vector2f gb_pos = pixels_to_meters(0,-400);
+    sf::Vector2f gb_pos = pixels_to_meters(0,-(app->window_height-20));
     groundBodyDef.position.Set(gb_pos.x, gb_pos.y);
     b2Body* groundBody = world->CreateBody(&groundBodyDef);
 
-    sf::Vector2f gb_scale = pixels_to_meters(400,-1);
+    sf::Vector2f gb_scale = pixels_to_meters(app->window_width/2,-1);
     groundBox.SetAsBox(gb_scale.x, gb_scale.y);
     groundBody->CreateFixture(&groundBox, 0.0f);
 
@@ -66,7 +67,6 @@ OverWorld::OverWorld(int prevState)
     timeStep = 1.0f / 60.0f; 
     velocityIterations = 8;
     positionIterations = 3;
-
 }
 
 
@@ -87,34 +87,36 @@ void OverWorld::resume()
     // pause the game
 }
 
-void OverWorld::handle_events(sf::Window &window)
+void OverWorld::handle_events(App *app)
 {
 
+    //std::cout << "ow handle_events got called" << std::endl;
+
     sf::Event event;
-    while (window.pollEvent(event))
+    while (app->window.pollEvent(event))
     {
-        // handle events for the player
-
-        // handle other events
-        switch (event.type)
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
         {
-            case sf::Event::Closed:
-                window.close();
-                set_next_state(STATE_EXIT);
-                break;
-        }
-
-        // handle quit event
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        {
-            //set_next_state(STATE_TITLE);
             set_next_state(STATE_PAUSE);
-            //window.close();
+            //std::cout << "overworld event loop: setting next state to PAUSE" << std::endl;
         }
+        
+        if(event.type == sf::Event::Closed)
+        {
+            std::cout << "Got close window event" << std::endl;
+            app->window.close();
+        }
+        
+        if (event.type == sf::Event::Resized)
+        {
+            app->window_width  = event.size.width;
+            app->window_height = event.size.height;
+        }
+
     }
 }
 
-void OverWorld::logic()
+void OverWorld::logic(App* app)
 {
 
     
@@ -132,17 +134,20 @@ void OverWorld::logic()
     // do logic, collision checks, etc
 
     // move the player etc
+
+    //std::cout << "inside ow logic loop" << std::endl;
 }
 
-void OverWorld::render(sf::RenderTarget& window, double& alpha)
+void OverWorld::render(App *app, double& alpha)
 {
 
+    //std::cout << "ow render got called" << std::endl;
     // clear screen and box2d force cache
     world->ClearForces();
-    window.clear();
+    app->window.clear();
 
     // draw the ground body
-    window.draw(grnd);
+    app->window.draw(grnd);
 
     // get interpolated position
     pos_x = curPosition.x * alpha + prevPosition.x * (1.0f - alpha);
@@ -150,7 +155,7 @@ void OverWorld::render(sf::RenderTarget& window, double& alpha)
 
     // position and draw the player
     entity.setPosition(pos_x, -pos_y);
-    window.draw(entity);
+    app->window.draw(entity);
 }
 
 

@@ -4,6 +4,7 @@
 #include <Box2D/Box2D.h>
 #include <SFML/System.hpp>
 #include <Functions.hpp>
+#include <App.hpp>
 
 
 class OverWorld : public GameState
@@ -43,17 +44,16 @@ class OverWorld : public GameState
 
     public:
         // load resources, init objects
-        OverWorld(int prevState);
+        OverWorld(int prevState, App* app);
         // free resources
         ~OverWorld();
 
         // main loop functions
-        void handle_events(sf::Window &window);
-        void logic();
+        void handle_events(App *app);
+        void logic(App* app);
         void pause();
         void resume();
-        void render(sf::RenderTarget &window, double& alpha);
-
+        void render(App *app, double& alpha);
 };
 
 #endif

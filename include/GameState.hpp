@@ -3,6 +3,7 @@
 
 #include <SFML/Window.hpp>
 #include <vector>
+#include <App.hpp>
 
 // state status manager
 void set_next_state(int newState);
@@ -21,10 +22,10 @@ enum GameStates
 class GameState
 {
     public:
-        virtual void handle_events(sf::Window &window) = 0;
-        virtual void logic() = 0;
-        virtual void render(sf::RenderTarget &window, double& alpha) = 0;
-        virtual ~GameState(){};
+        virtual void handle_events(App *app) = 0;
+        virtual void logic(App* app) = 0;
+        virtual void render(App *app, double &alpha) = 0;
+        //virtual ~GameState(){};
 };
 
 #endif

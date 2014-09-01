@@ -1,6 +1,8 @@
 #ifndef   TITLE_HPP_INCLUDED
 #define   TITLE_HPP_INCLUDED
 
+#include <App.hpp>
+
 // title state
 class Title : public GameState
 {
@@ -12,14 +14,14 @@ class Title : public GameState
 
     public:
         // loads title screen resources
-        Title();
+        Title(App* app);
         // free resources
         ~Title();
 
         // main loop functions
-        void handle_events(sf::Window &window);
-        void logic();
-        void render(sf::RenderTarget &window, double& alpha);
+        void handle_events(App *app);
+        void logic(App* app);
+        void render(App *app, double& alpha);
 };
 
 #endif

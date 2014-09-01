@@ -3,9 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <memory>
+#include <json/json.h>
 
 // boil2d core
+#include <App.hpp>
 #include <GameState.hpp>
 #include <Functions.hpp>
 
@@ -23,7 +27,9 @@ int stateID = STATE_NULL;
 int nextState = STATE_NULL;
 
 // game state object
-GameState *currentState = NULL;
+//GameState *currentState = NULL;
+std::unique_ptr<GameState> currentState;
+std::unique_ptr<GameState> pausedState;
 
 
 bool load_files()
@@ -48,39 +54,39 @@ void set_next_state(int newState)
     }
 }
 
-void change_state(std::vector<GameState*>& state_stack)
+void change_state(App* app)
 {
     if(nextState != STATE_NULL)
     {
 
-        if(stateID == STATE_OVERWORLD)
-            state_stack.push_back(currentState); // put the current state onto the stack
-
-        // delete current state
-        if(nextState != STATE_EXIT && nextState != STATE_PAUSE)
-            delete currentState;
+        if(stateID == STATE_OVERWORLD && nextState == STATE_PAUSE)
+        {
+            //state_stack.push_back(currentState); // put the current state onto the stack
+            // TODO swap with whatever is on the stack vector?
+            pausedState.swap(currentState);
+        }
 
         // change the state
         switch(nextState)
         {
             case STATE_TITLE:
-                currentState = new Title();
-                break;
-
-            case STATE_PAUSE:
-                currentState = new Pause();
+                currentState.reset(new Title(app));
                 break;
 
             case STATE_OVERWORLD:
                 if(stateID == STATE_PAUSE)
                 {
-                    currentState = state_stack.back();
-                    state_stack.pop_back(); // clear the last state from the stack
+                    currentState.swap(pausedState);
+                    //state_stack.pop_back(); // clear the last state from the stack
                 }
                 else
                 {
-                    currentState = new OverWorld(stateID);
+                    currentState.reset(new OverWorld(stateID, app));
                 }
+                break;
+
+            case STATE_PAUSE:
+                currentState.reset(new Pause(app));
                 break;
         }
 
@@ -89,21 +95,22 @@ void change_state(std::vector<GameState*>& state_stack)
 
         // nullify next state ID
         nextState = STATE_NULL;
+
     }
 }
 
-void clean_up()
+void clean_up(App *app)
 {
     // do cleanup
-    delete currentState;
+    currentState.reset();
+    delete app;
 }
 
 int main()
 {
-    // init, load files, etc
-    sf::RenderWindow window(sf::VideoMode(800,420), "LD30", 32);
-    window.setFramerateLimit(240);
-    window.setVerticalSyncEnabled(false);
+    // instantiate the app class
+    App *app = new App();
+
 
     // gaffer loop time stuff
     sf::Clock clock;
@@ -121,10 +128,11 @@ int main()
 
     // set initial state
     stateID = STATE_TITLE;
-    currentState = new Title();
+    currentState.reset(new Title(app));
+    pausedState.reset(new Pause(app));
 
-    // init the state stack TODO - just store as "previousState" instead of a vector?
-    std::vector<GameState*> state_stack;
+    // init the state stack TODO - just work with the stack directly instead of currentState?
+    //std::vector<GameState>& state_stack;
 
 
 
@@ -141,14 +149,14 @@ int main()
         accumulator += frameTime;
 
         // handle events
-        currentState->handle_events(window);
+        currentState->handle_events(app);
 
         // fixed timestep update loop
         while ( accumulator >= dt )
         {
-            if (stateID != STATE_PAUSE)
-                // do logic for current state
-                currentState->logic();
+            //if (stateID != STATE_PAUSE)
+            // do logic for current state
+            currentState->logic(app);
 
 
             // decrement accumulator
@@ -159,19 +167,19 @@ int main()
         alpha = accumulator / dt;
 
         // change state if needed
-        change_state(state_stack);
+        change_state(app);
 
         // render the state
-        currentState->render(window, alpha);
+        currentState->render(app, alpha);
 
         // update screen
-        window.display();
+        app->window.display();
 
         // calculate FPS for output
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
-        std::cout << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
+        //std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
     }
     // do cleanup
-    clean_up();
+    clean_up(app);
 }
