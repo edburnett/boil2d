@@ -15,5 +15,5 @@ point.
 
 requirements
 ============
-SFML >= 2.0
+SFML >= 2.1
 Box2D >= 2.3
