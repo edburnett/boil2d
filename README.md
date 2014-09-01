@@ -2,7 +2,7 @@ boil2d
 ======
 Aims to become a boilerplate framework for creating custom 2D game engines in
 C++. Not a game engine itself, but a launching point for one. The goal is to be
-able to clone a repo and have a basic project ready to go for fast prototyping,
+able to clone a repo and have a basic project ready to go for rapid prototyping,
 gamedev compos, etc., without resorting to using a full-blown engine.
 
 Wrap libraries such as SFML and Box2D, and provide classes for a finite state

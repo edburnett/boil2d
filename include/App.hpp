@@ -21,8 +21,6 @@ class App
         // methods
         Json::Value get_config();
 
-
-
         // empty destructor
         ~App(){};
 };
