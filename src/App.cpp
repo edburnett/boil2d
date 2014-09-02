@@ -14,20 +14,38 @@ App::App()
     // load config data from file
     config = get_config();
 
-    // get the user's desktop mode
+    // get the current and available video mode(s)
     desktop_mode = sf::VideoMode::getDesktopMode();
+    video_modes  = sf::VideoMode::getFullscreenModes();
 
-    // store window values
-    window_height = config["window_height"].asInt();
-    window_width  = config["window_width"].asInt();
-    if(window_width == 0 || window_height == 0)
-    {
-        // TODO: handle this?
-        throw std::out_of_range("error retrieving config values");
-    }
+    fullscreen = config.get("fullscreen", false).asBool();
 
     // create the window
-    window.create(sf::VideoMode(window_width, window_height), "Shooter", sf::Style::Resize);
+    if(fullscreen && video_modes[0].isValid())
+    {
+        std::cout << "setting fullscreen from best mode detected" << std::endl;
+        window_width  = video_modes[0].width;
+        window_height = video_modes[0].height;
+        window_bpp    = video_modes[0].bitsPerPixel;
+        window.create(sf::VideoMode(window_width, window_height, window_bpp), "boil2d", sf::Style::Fullscreen);
+    }
+    else if(fullscreen && !video_modes[0].isValid())
+    {
+        std::cout << "setting fullscreen from desktop mode" << std::endl;
+        window_width  = desktop_mode.width;
+        window_height = desktop_mode.height;
+        window_bpp    = desktop_mode.bitsPerPixel;
+        window.create(sf::VideoMode(desktop_mode), "boil2d", sf::Style::Fullscreen);
+    }
+    else
+    {
+        std::cout << "setting from config values" << std::endl;
+        window_width  = config.get("window_width", WINDOW_WIDTH_DEFAULT).asInt();
+        window_height = config.get("window_height", WINDOW_HEIGHT_DEFAULT).asInt();
+        window_bpp    = desktop_mode.bitsPerPixel;
+        window.create(sf::VideoMode(window_width, window_height, window_bpp), "boil2d", sf::Style::Resize);
+    }
+
     window.setFramerateLimit(240);
 
 
@@ -48,11 +66,12 @@ Json::Value App::get_config()
     }
     else if(!read_success && !config_file.is_open())
     {
-        std::cout << "Config file not found, creating new one." << std::endl;
+        std::cout << "Config file not found, initializing new one." << std::endl;
 
         // add default values
-        config["window_width"] = 960;
-        config["window_height"] = 540;
+        config["window_width"] = WINDOW_WIDTH_DEFAULT;
+        config["window_height"] = WINDOW_HEIGHT_DEFAULT;
+        config["fullscreen"] = false;
 
         std::ofstream config_file("config.json");
 

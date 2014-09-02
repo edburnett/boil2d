@@ -52,7 +52,7 @@ void Title::handle_events(App *app)
             case sf::Event::KeyPressed:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
                 {
-                    std::cout << "title event loop: setting next state to overworld" << std::endl;
+                    //std::cout << "title event loop: setting next state to overworld" << std::endl;
                     set_next_state(STATE_OVERWORLD);
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))

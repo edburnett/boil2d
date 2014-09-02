@@ -27,7 +27,6 @@ int stateID = STATE_NULL;
 int nextState = STATE_NULL;
 
 // game state object
-//GameState *currentState = NULL;
 std::unique_ptr<GameState> currentState;
 std::unique_ptr<GameState> pausedState;
 
