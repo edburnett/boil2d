@@ -61,6 +61,11 @@ void Title::handle_events(App *app)
                     app->window.close();
                 }
                 break;
+            case sf::Event::Resized:
+                //app->window_width  = event.size.width;
+                //app->window_height = event.size.height;
+                break;
+
         }
 
     }

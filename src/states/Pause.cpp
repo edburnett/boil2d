@@ -140,10 +140,10 @@ void Pause::handle_events(App *app)
         
         if (event.type == sf::Event::Resized)
         {
-            /*
-            app->window_width  = event.size.width;
-            app->window_height = event.size.height;
-            */
+            
+            //app->window_width  = event.size.width;
+            //app->window_height = event.size.height;
+            
         }
 
     }
