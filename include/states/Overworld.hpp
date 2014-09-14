@@ -5,6 +5,7 @@
 #include <SFML/System.hpp>
 #include <Functions.hpp>
 #include <App.hpp>
+#include <Player.hpp>
 
 
 class OverWorld : public GameState
@@ -15,29 +16,18 @@ class OverWorld : public GameState
 
         // SFML shapes
         sf::RectangleShape grnd;
-        sf::RectangleShape entity;
 
         // box2d things
 
-        b2World* world; // box2d world
-        b2Body* body;
         b2BodyDef groundBodyDef; // ground body
         b2PolygonShape groundBox; // gound fixture
-        b2BodyDef bodyDef; // dynamic body
-        b2PolygonShape dynamicBox; // dynamic fixture
-        b2FixtureDef fixtureDef;
+
         float32 timeStep;
         int32 velocityIterations;
         int32 positionIterations;
 
-        float player_pos_x;
-        float player_pos_y;
 
-        // the curerent and previous position/angle/etc of the player goes here?
-        sf::Vector2f prevPosition; // in pixels - convert this automagically?
-        sf::Vector2f curPosition;  // in pixels - convert this automagically?
-        float pos_x;
-        float pos_y;
+
 
 
 
@@ -47,6 +37,12 @@ class OverWorld : public GameState
         OverWorld(int prevState, App* app);
         // free resources
         ~OverWorld();
+
+
+        // create the box2d world
+        b2World* world;
+        // create the player object
+        Player player;
 
         // main loop functions
         void handle_events(App *app);

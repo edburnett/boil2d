@@ -1,5 +1,5 @@
-#ifndef   APP_HPP_INCLUDED
-#define   APP_HPP_INCLUDED
+#ifndef   App_HPP_INCLUDED
+#define   App_HPP_INCLUDED
 
 #include <json/json.h>
 
