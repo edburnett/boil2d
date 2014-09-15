@@ -48,9 +48,8 @@ OverWorld::OverWorld(int prevState, App* app)
 
     // debug draw
     debug_draw.LinkTarget(app->window);
+    debug_draw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit);
     world->SetDebugDraw(&debug_draw);
-    debug_draw.SetFlags(b2Draw::e_shapeBit);
-    debug_draw.SetFlags(b2Draw::e_centerOfMassBit);
 
 
     // box2d timestep values
