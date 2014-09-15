@@ -34,13 +34,13 @@ class OverWorld : public GameState
         // free resources
         ~OverWorld();
 
-
+        // debug draw instance
+        DebugDraw debug_draw;
         // create the box2d world
         b2World* world;
         // create the player object
         Player player;
-        // debug draw instance
-        DebugDraw debug_draw;
+
 
         // main loop functions
         void handle_events(App *app);

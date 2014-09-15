@@ -46,6 +46,12 @@ OverWorld::OverWorld(int prevState, App* app)
     player.player_body = world->CreateBody(&player.player_bodyDef);
     player.player_body->CreateFixture(&player.player_fixtureDef);
 
+    // debug draw
+    debug_draw.LinkTarget(app->window);
+    world->SetDebugDraw(&debug_draw);
+    debug_draw.SetFlags(b2Draw::e_shapeBit);
+    debug_draw.SetFlags(b2Draw::e_centerOfMassBit);
+
 
     // box2d timestep values
     timeStep = 1.0f / 60.0f; 
@@ -145,6 +151,5 @@ void OverWorld::render(App *app, double& alpha)
     // position and draw the player
     player.player_shape.setPosition(pos_x, -pos_y);
     app->window.draw(player.player_shape);
+    world->DrawDebugData();
 }
-
-
