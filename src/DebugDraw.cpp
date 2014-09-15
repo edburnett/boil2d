@@ -83,7 +83,12 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Ve
 
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-
+    sf::Vertex line[2];//const sized c styled array, safe enough in here
+    line[0].color=EEColor(color);
+    line[0].position=EEVector(p1);
+    line[1].color=EEColor(color);
+    line[1].position=EEVector(p2);
+    m_target->draw(line,2,sf::Lines);
     std::cout << "hit DrawSegment" << std::endl;
 }
 
@@ -95,6 +100,10 @@ void DebugDraw::DrawTransform(const b2Transform& xf)
 
 void DebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
 {
+    sf::CircleShape shape(size);
+    shape.setOutlineColor(EEColor(color));
+    shape.setFillColor(EEColor(color));
+    m_target->draw(shape);
     std::cout << "hit DrawPoint" << std::endl;
 }
 

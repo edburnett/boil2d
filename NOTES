@@ -6,3 +6,5 @@ function and game loop.
 
 Create another state class layer for Level or Gameplay. Expand upon that to
 subdivide into levels, planets, rooms, etc.
+
+Implement rest of debug draw functions.
