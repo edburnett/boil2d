@@ -27,11 +27,6 @@ class OverWorld : public GameState
         int32 positionIterations;
 
 
-
-
-
-
-
     public:
         // load resources, init objects
         OverWorld(int prevState, App* app);

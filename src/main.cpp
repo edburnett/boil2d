@@ -33,6 +33,7 @@ std::unique_ptr<GameState> pausedState;
 
 bool load_files()
 {
+    // TODO: create and move this to App()?
 
     // load image
     // do error check
@@ -174,7 +175,7 @@ int main()
         // update screen
         app->window.display();
 
-        // calculate FPS for output
+        // calculate FPS
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
         //std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;

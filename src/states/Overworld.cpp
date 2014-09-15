@@ -37,7 +37,7 @@ OverWorld::OverWorld(int prevState, App* app)
     groundBodyDef.position.Set(gb_pos.x, gb_pos.y);
     b2Body* groundBody = world->CreateBody(&groundBodyDef);
 
-    sf::Vector2f gb_scale = pixels_to_meters(app->window_width/2,-1);
+    sf::Vector2f gb_scale = pixels_to_meters(app->window_width,-1);
     groundBox.SetAsBox(gb_scale.x, gb_scale.y);
     groundBody->CreateFixture(&groundBox, 0.0f);
 
@@ -98,19 +98,24 @@ void OverWorld::handle_events(App *app)
             //app->window_height = event.size.height;
         }
 
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
+        {
+            player.player_body->ApplyAngularImpulse(float32(-20), true);
+        }
+
     }
 }
 
 void OverWorld::logic(App* app)
 {
     // get previous player position
-    player.prevPosition = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+    player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
     
     // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);
 
     // get new player position
-    player.curPosition = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+    player.cur_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
 
     //player.player_shape.setRotation(player_body->GetAngle() * (180/3.14159265359));
     player.update_angle();
@@ -133,8 +138,8 @@ void OverWorld::render(App *app, double& alpha)
     app->window.draw(grnd);
 
     // get interpolated position
-    float pos_x = player.curPosition.x * alpha + player.prevPosition.x * (1.0f - alpha);
-    float pos_y = player.curPosition.y * alpha + player.prevPosition.y * (1.0f - alpha);
+    float pos_x = player.cur_position.x * alpha + player.prev_position.x * (1.0f - alpha);
+    float pos_y = player.cur_position.y * alpha + player.prev_position.y * (1.0f - alpha);
 
     // position and draw the player
     player.player_shape.setPosition(pos_x, -pos_y);

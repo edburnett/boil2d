@@ -12,6 +12,10 @@ class Entity
     public:
         Entity();
         ~Entity(){};
+
+        // entity's position in pixels
+        sf::Vector2f prev_position;
+        sf::Vector2f cur_position;
 };
 
 #endif

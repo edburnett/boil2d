@@ -13,19 +13,18 @@ class Player : public Entity
     public:
         Player();
         
-        // sfml box/rectable representing the player
-        sf::RectangleShape player_shape;
+        // sfml sprite representing the player
+        sf::Sprite player_shape;
         // dynamic body
         b2Body* player_body;
         b2BodyDef player_bodyDef;
         // dynamic fixture
-        b2PolygonShape player_fixture; 
+        //b2PolygonShape player_fixture; 
+        b2CircleShape player_fixture;
         b2FixtureDef player_fixtureDef;
-        b2PolygonShape player_dynamicBox;
 
-        // player's position in pixels
-        sf::Vector2f prevPosition;
-        sf::Vector2f curPosition;
+        // player texture
+        sf::Texture texture;
 
         // methods
         void set_position();
