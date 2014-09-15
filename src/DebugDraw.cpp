@@ -46,7 +46,7 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, cons
     shape.setPointCount(vertexCount);
     for(int i = 0; i < vertexCount; ++i)
     {
-        shape.setPoint(i,-EEVector(vertices[i]));
+        shape.setPoint(i,EEVector(vertices[i]));
     }
     m_target->draw(shape);
 
@@ -60,7 +60,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
     shape.setOutlineThickness(1);
     shape.setFillColor(sf::Color::Transparent);
     shape.setRadius(radius*pixmeters);
-    shape.setOrigin(sf::Vector2f(radius*pixmeters,-radius*pixmeters));//set origin to middle or position setter below would not work correctly
+    shape.setOrigin(sf::Vector2f(radius*pixmeters,radius*pixmeters));//set origin to middle or position setter below would not work correctly
     shape.setPosition(EEVector(center));
     m_target->draw(shape);
 
@@ -75,7 +75,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Ve
     shape.setOutlineThickness(1);
     shape.setFillColor(sf::Color::Blue);
     shape.setRadius(radius*pixmeters);
-    shape.setOrigin(sf::Vector2f(radius*pixmeters,-radius*pixmeters));//set origin to middle or position setter below would not work correctly
+    shape.setOrigin(sf::Vector2f(radius*pixmeters,radius*pixmeters));//set origin to middle or position setter below would not work correctly
     shape.setPosition(EEVector(center));
     m_target->draw(shape);
     std::cout << "hit DrawSolidCircle" << std::endl;
