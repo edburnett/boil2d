@@ -48,7 +48,7 @@ OverWorld::OverWorld(int prevState, App* app)
 
     // debug draw
     debug_draw.LinkTarget(app->window);
-    debug_draw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit);
+    debug_draw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit | b2Draw::e_aabbBit | b2Draw::e_jointBit | b2Draw::e_pairBit);
     world->SetDebugDraw(&debug_draw);
 
 

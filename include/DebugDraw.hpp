@@ -22,7 +22,7 @@ class DebugDraw : public b2Draw
 
         inline sf::Vector2f EEVector(const b2Vec2& gVec)
         {
-            return sf::Vector2f(gVec.x*pixmeters,gVec.y*pixmeters);
+            return sf::Vector2f(gVec.x*pixmeters,-gVec.y*pixmeters);
         }
         
         const float pixmeters,radegrees;
