@@ -40,7 +40,7 @@ Player::Player()
     //sf::Vector2f db_size = pixels_to_meters(20,40);
     //sf::Vector2f db_size = pixels_to_meters(64,64);
     //player_fixture.SetAsBox(db_size.x, db_size.y);
-    player_fixture.m_p.Set(0,-0);
+    player_fixture.m_p.Set(0,0);
     player_fixture.m_radius = 1; // TODO: this is probably wrong!
     player_fixtureDef.shape = &player_fixture;
     player_fixtureDef.density = 1.0f;

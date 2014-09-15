@@ -6,6 +6,7 @@
 #include <Functions.hpp>
 #include <App.hpp>
 #include <Player.hpp>
+#include <DebugDraw.hpp>
 
 
 class OverWorld : public GameState
@@ -38,6 +39,8 @@ class OverWorld : public GameState
         b2World* world;
         // create the player object
         Player player;
+        // debug draw instance
+        DebugDraw debug_draw;
 
         // main loop functions
         void handle_events(App *app);

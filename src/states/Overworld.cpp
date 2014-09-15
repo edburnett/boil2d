@@ -11,6 +11,7 @@
 #include <Overworld.hpp>
 #include <App.hpp>
 #include <Player.hpp>
+#include <DebugDraw.hpp>
 
 
 
