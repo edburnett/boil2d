@@ -48,6 +48,7 @@ App::App()
 
     window.setFramerateLimit(240);
 
+    debug_draw = true;
 
 }
 

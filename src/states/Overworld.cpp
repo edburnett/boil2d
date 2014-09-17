@@ -26,7 +26,7 @@ OverWorld::OverWorld(int prevState, App* app)
     // ground shape
     grnd.setPosition(0,app->window_height-20);
     grnd.setSize(sf::Vector2f(app->window_width,20));
-    grnd.setFillColor(sf::Color::Cyan);
+    grnd.setFillColor(sf::Color(76,67,53,128));
 
     //box2d world stuff
     b2Vec2 gravity(0, -9.8); // earth gravity is -9.8
@@ -106,7 +106,27 @@ void OverWorld::handle_events(App *app)
 
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
         {
-            player.player_body->ApplyAngularImpulse(float32(-20), true);
+            player.player_body->ApplyTorque(float32(-5), true);
+        }
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Left))
+        {
+            player.player_body->ApplyTorque(float32(5), true);
+        }
+
+        // toggle debug draw
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
+        {
+            switch(app->debug_draw) 
+            {
+                case false:
+                    app->debug_draw = true;
+                    break;
+                case true:
+                    app->debug_draw = false;
+                    break;
+            }
+                    
+
         }
 
     }
@@ -150,5 +170,8 @@ void OverWorld::render(App *app, double& alpha)
     // position and draw the player
     player.player_shape.setPosition(pos_x, -pos_y);
     app->window.draw(player.player_shape);
-    world->DrawDebugData();
+
+    // debug draw if option enabled
+    if(app->debug_draw)
+        world->DrawDebugData();
 }

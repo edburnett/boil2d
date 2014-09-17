@@ -7,4 +7,6 @@ function and game loop.
 Create another state class layer for Level or Gameplay. Expand upon that to
 subdivide into levels, planets, rooms, etc.
 
-Implement rest of debug draw functions.
+Implement rest of debug draw functions. Fix colors so that they make sense
+and have transparency to see objects underneath. Match colors of box2d 
+testbed? Allow runtime toggling of the individual draw functions.

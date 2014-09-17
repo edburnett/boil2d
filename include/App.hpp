@@ -20,6 +20,7 @@ class App
         int window_width;
         int window_bpp;
         bool fullscreen;
+        bool debug_draw;
 
         // methods
         Json::Value get_config();
