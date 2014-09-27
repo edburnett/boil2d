@@ -19,8 +19,8 @@ class Player : public Entity
         b2Body* player_body;
         b2BodyDef player_bodyDef;
         // dynamic fixture
-        //b2PolygonShape player_fixture; 
-        b2CircleShape player_fixture;
+        b2PolygonShape player_fixture; 
+        //b2CircleShape player_fixture;
         b2FixtureDef player_fixtureDef;
 
         // player texture

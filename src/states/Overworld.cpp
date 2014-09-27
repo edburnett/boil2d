@@ -106,11 +106,17 @@ void OverWorld::handle_events(App *app)
 
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
         {
-            player.player_body->ApplyTorque(float32(-5), true);
+            //player.player_body->ApplyTorque(float32(-5), true);
+            b2Vec2 force = b2Vec2(1.0f, 0);
+            b2Vec2 point = player.player_body->GetWorldCenter();
+            player.player_body->ApplyLinearImpulse(force,point,true);
         }
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Left))
         {
-            player.player_body->ApplyTorque(float32(5), true);
+            //player.player_body->ApplyTorque(float32(5), true);
+            b2Vec2 force = b2Vec2(-1.0f, 0);
+            b2Vec2 point = player.player_body->GetWorldCenter();
+            player.player_body->ApplyLinearImpulse(force,point,true);
         }
 
         // toggle debug draw

@@ -24,31 +24,23 @@ Player::Player()
     cur_position = sf::Vector2f(start_pos_x, start_pos_y);
     prev_position = sf::Vector2f(start_pos_x, start_pos_y);
     player_shape.setTexture(texture);
+    //player_shape.setTextureRect(sf::IntRect(0,16,64,48));
     player_shape.setPosition(start_pos_x,start_pos_y);
     // set origin to center TODO turn this sort of thing into a method?
     sf::FloatRect bounds = player_shape.getGlobalBounds();
     player_shape.setOrigin(bounds.width/2, bounds.height/2);
     
-    //texture.setSmooth(false);
-    //sf::Vector2u size = texture.getSize();
-    //std::cout << size.x << size.y << std::endl;
-    //player_shape.setScale(sf::Vector2f(1.0f,1.0f));
-    //player_shape.setColor(sf::Color(255,255,255,200));
-    //player_shape.setSize(sf::Vector2f(64,64));
-    //player_shape.setFillColor(sf::Color::Red);
-    //player_shape.setScale(sf::Vector2f(1.0f,1.0f));
-
+    //texture.setSmooth(true);
 
     // box2d dynamic body
     player_bodyDef.type = b2_dynamicBody;
     sf::Vector2f db_pos = pixels_to_meters(100,0);
     player_bodyDef.position.Set(db_pos.x, db_pos.y);
 
-    //sf::Vector2f db_size = pixels_to_meters(20,40);
-    //sf::Vector2f db_size = pixels_to_meters(64,64);
-    //player_fixture.SetAsBox(db_size.x, db_size.y);
-    player_fixture.m_p.Set(0,0);
-    player_fixture.m_radius = 0.64; // TODO: this is probably wrong! Calculate it automatically
+    //player_fixture.m_p.Set(0,0);
+    //player_fixture.m_radius = 0.64; // TODO: this is probably wrong! Calculate it automatically
+    sf::Vector2f db_size = pixels_to_meters(32,16); // half-width/half-height for SetAsBox
+    player_fixture.SetAsBox(db_size.x, db_size.y);
     player_fixtureDef.shape = &player_fixture;
     player_fixtureDef.density = 1.0f;
     player_fixtureDef.friction = 0.3f;
