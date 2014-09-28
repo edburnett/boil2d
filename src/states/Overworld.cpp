@@ -107,16 +107,29 @@ void OverWorld::handle_events(App *app)
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
         {
             //player.player_body->ApplyTorque(float32(-5), true);
-            b2Vec2 force = b2Vec2(1.0f, 0);
-            b2Vec2 point = player.player_body->GetWorldCenter();
-            player.player_body->ApplyLinearImpulse(force,point,true);
+            
+            //b2Vec2 force = b2Vec2(1.0f, 0);
+            //b2Vec2 point = player.player_body->GetWorldCenter();
+            //player.player_body->ApplyLinearImpulse(force,point,true);
+            player.movement = player.RIGHT;
         }
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Left))
         {
             //player.player_body->ApplyTorque(float32(5), true);
-            b2Vec2 force = b2Vec2(-1.0f, 0);
-            b2Vec2 point = player.player_body->GetWorldCenter();
-            player.player_body->ApplyLinearImpulse(force,point,true);
+            
+            //b2Vec2 force = b2Vec2(-1.0f, 0);
+            //b2Vec2 point = player.player_body->GetWorldCenter();
+            //player.player_body->ApplyLinearImpulse(force,point,true);
+            player.movement = player.LEFT;
+        }
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
+        {
+            //player.player_body->ApplyTorque(float32(5), true);
+            
+            //b2Vec2 force = b2Vec2(-1.0f, 0);
+            //b2Vec2 point = player.player_body->GetWorldCenter();
+            //player.player_body->ApplyLinearImpulse(force,point,true);
+            player.movement = player.STOP;
         }
 
         // toggle debug draw
@@ -142,6 +155,28 @@ void OverWorld::logic(App* app)
 {
     // get previous player position
     player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+
+    // handle player movement
+    b2Vec2 vel = player.player_body->GetLinearVelocity();
+    float desired_vel = 0;
+    switch(player.movement)
+    {
+        case player.LEFT:
+            //desired_vel = -5;
+            desired_vel = b2Max(vel.x - 0.1f, -5.0f);
+            break;
+        case player.RIGHT:
+            //desired_vel = 5;
+            desired_vel = b2Min(vel.x + 0.1f, 5.0f);
+            break;
+        case player.STOP:
+            //desired_vel = 0;
+            desired_vel = vel.x * 0.98;
+            break;
+    }
+    float vel_change = desired_vel - vel.x;
+    float impulse = player.player_body->GetMass() * vel_change;
+    player.player_body->ApplyLinearImpulse(b2Vec2(impulse,0), player.player_body->GetWorldCenter(), true);
     
     // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);

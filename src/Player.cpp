@@ -45,6 +45,9 @@ Player::Player()
     player_fixtureDef.density = 1.0f;
     player_fixtureDef.friction = 0.3f;
     player_fixtureDef.restitution = 0.1f; // bounciness from 0 to 1
+
+    // set the initial move_state
+    movement = STOP;
 }
 
 

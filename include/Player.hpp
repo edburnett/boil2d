@@ -23,6 +23,16 @@ class Player : public Entity
         //b2CircleShape player_fixture;
         b2FixtureDef player_fixtureDef;
 
+        enum move_state {
+            STOP,
+            LEFT,
+            RIGHT,
+            UP,
+            DOWN,
+        };
+
+        move_state movement;
+
         // player texture
         sf::Texture texture;
 
