@@ -192,29 +192,30 @@ void OverWorld::logic(App* app)
 
     // handle player movement
     b2Vec2 vel = player.player_body->GetLinearVelocity();
-    float desired_vel_x = 0;
-    float desired_vel_y = 0;
+    sf::Vector2f desired_vel;
+    //float desired_vel_x = 0;
+    //float desired_vel_y = 0;
     switch(player.movement)
     {
         case player.LEFT:
-            desired_vel_x = b2Max(vel.x - 0.9f, -12.0f);
+            desired_vel.x += b2Max(vel.x - 0.9f, -12.0f);
             break;
         case player.RIGHT:
-            desired_vel_x = b2Min(vel.x + 0.9f, 12.0f);
+            desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
             break;
         case player.UP:
-            desired_vel_y = b2Min(vel.y + 0.9f, 12.0f);
+            desired_vel.y += b2Min(vel.y + 0.9f, 12.0f);
             break;
         case player.DOWN:
-            desired_vel_y = b2Max(vel.y - 0.9f, -12.0f);
+            desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
             break;
         case player.STOP:
-            desired_vel_x = vel.x * 0.82; // <1, smaller value = faster stop
-            desired_vel_y = vel.y * 0.82; // <1, smaller value = faster stop
+            desired_vel.x = vel.x * 0.82; // <1, smaller value = faster stop
+            desired_vel.y = vel.y * 0.82; // <1, smaller value = faster stop
             break;
     }
-    float vel_change_x = desired_vel_x - vel.x;
-    float vel_change_y = desired_vel_y - vel.y;
+    float vel_change_x = desired_vel.x - vel.x;
+    float vel_change_y = desired_vel.y - vel.y;
     float impulse_x = player.player_body->GetMass() * vel_change_x;
     float impulse_y = player.player_body->GetMass() * vel_change_y;
     player.player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player.player_body->GetWorldCenter(), true);
