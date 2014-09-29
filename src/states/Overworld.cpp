@@ -30,6 +30,7 @@ OverWorld::OverWorld(int prevState, App* app)
 
     //box2d world stuff
     b2Vec2 gravity(0, -9.8); // earth gravity is -9.8
+    //b2Vec2 gravity(0, 0); // earth gravity is -9.8
     world = new b2World(gravity); // second bool sleep argument defaults to true in 2.2.1+
     world->SetAutoClearForces(false);
 
@@ -104,6 +105,7 @@ void OverWorld::handle_events(App *app)
             //app->window_height = event.size.height;
         }
 
+        /*
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
         {
             //player.player_body->ApplyTorque(float32(-5), true);
@@ -122,6 +124,14 @@ void OverWorld::handle_events(App *app)
             //player.player_body->ApplyLinearImpulse(force,point,true);
             player.movement = player.LEFT;
         }
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Up))
+        {
+            player.movement = player.UP;
+        }
+        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Down))
+        {
+            player.movement = player.DOWN;
+        }
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
         {
             //player.player_body->ApplyTorque(float32(5), true);
@@ -131,6 +141,7 @@ void OverWorld::handle_events(App *app)
             //player.player_body->ApplyLinearImpulse(force,point,true);
             player.movement = player.STOP;
         }
+        */
 
         // toggle debug draw
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
@@ -148,6 +159,29 @@ void OverWorld::handle_events(App *app)
 
         }
 
+    } // event loop
+
+    // player movement real-time key presses
+    player.movement = player.STOP;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        player.movement = player.RIGHT;
+    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    {
+        player.movement = player.LEFT;
+    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {
+        player.movement = player.UP;
+    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {
+        player.movement = player.DOWN;
+    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        player.movement = player.STOP;
     }
 }
 
@@ -158,25 +192,32 @@ void OverWorld::logic(App* app)
 
     // handle player movement
     b2Vec2 vel = player.player_body->GetLinearVelocity();
-    float desired_vel = 0;
+    float desired_vel_x = 0;
+    float desired_vel_y = 0;
     switch(player.movement)
     {
         case player.LEFT:
-            //desired_vel = -5;
-            desired_vel = b2Max(vel.x - 0.1f, -5.0f);
+            desired_vel_x = b2Max(vel.x - 0.9f, -12.0f);
             break;
         case player.RIGHT:
-            //desired_vel = 5;
-            desired_vel = b2Min(vel.x + 0.1f, 5.0f);
+            desired_vel_x = b2Min(vel.x + 0.9f, 12.0f);
+            break;
+        case player.UP:
+            desired_vel_y = b2Min(vel.y + 0.9f, 12.0f);
+            break;
+        case player.DOWN:
+            desired_vel_y = b2Max(vel.y - 0.9f, -12.0f);
             break;
         case player.STOP:
-            //desired_vel = 0;
-            desired_vel = vel.x * 0.98;
+            desired_vel_x = vel.x * 0.82; // <1, smaller value = faster stop
+            desired_vel_y = vel.y * 0.82; // <1, smaller value = faster stop
             break;
     }
-    float vel_change = desired_vel - vel.x;
-    float impulse = player.player_body->GetMass() * vel_change;
-    player.player_body->ApplyLinearImpulse(b2Vec2(impulse,0), player.player_body->GetWorldCenter(), true);
+    float vel_change_x = desired_vel_x - vel.x;
+    float vel_change_y = desired_vel_y - vel.y;
+    float impulse_x = player.player_body->GetMass() * vel_change_x;
+    float impulse_y = player.player_body->GetMass() * vel_change_y;
+    player.player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player.player_body->GetWorldCenter(), true);
     
     // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);
