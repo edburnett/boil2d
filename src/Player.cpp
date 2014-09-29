@@ -57,5 +57,5 @@ void Player::set_position()
 
 void Player::update_angle()
 {
-    player_shape.setRotation(player_body->GetAngle() * (180/3.14159265359));
+    player_shape.setRotation(-player_body->GetAngle() * (180/3.14159265359));
 }

@@ -163,6 +163,7 @@ void OverWorld::handle_events(App *app)
     } // event loop
 
     // player movement real-time key presses
+    // TODO: use bools instead of an enum so multiple presses can be true at once
     player.movement = player.STOP;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         player.movement = player.RIGHT;
@@ -236,10 +237,24 @@ void OverWorld::logic(App* app)
         desired_vel.y += vel.y * 0.82; // <1, smaller value = faster stop
     }
 
+    // normalize. TODO: too slow. whats wrong here? constant speed? print out the values with and without this.
+    if (desired_vel.x != 0.f && desired_vel.y != 0.f)
+    {
+        std::cout << "nonzero desired_vel" << std::endl;
+        desired_vel /= std::sqrt(2.f);
+    }
+
     float vel_change_x = desired_vel.x - vel.x;
     float vel_change_y = desired_vel.y - vel.y;
-    float impulse_x = player.player_body->GetMass() * vel_change_x;
-    float impulse_y = player.player_body->GetMass() * vel_change_y;
+    /*
+    if (vel_change_x != 0.f && vel_change_y != 0.f)
+    {
+        vel_change_x /= std::sqrt(2.f);
+        vel_change_y /= std::sqrt(2.f);
+    }
+    */
+    float impulse_x = (player.player_body->GetMass() * vel_change_x);
+    float impulse_y = (player.player_body->GetMass() * vel_change_y);
     player.player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player.player_body->GetWorldCenter(), true);
     
     // do physics step
