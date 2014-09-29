@@ -26,10 +26,19 @@ class Player : public Entity
         enum move_state {
             STOP,
             LEFT,
+            LEFT_DOWN,
+            LEFT_UP,
             RIGHT,
+            RIGHT_DOWN,
+            RIGHT_UP,
             UP,
             DOWN,
         };
+
+        bool M_LEFT = false;
+        bool M_RIGHT = false;
+        bool M_UP = false;
+        bool M_DOWN = false;
 
         move_state movement;
 

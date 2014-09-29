@@ -4,6 +4,7 @@
 #include <Box2D/Box2D.h>
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 // boil2d
 #include <GameState.hpp>
@@ -164,25 +165,23 @@ void OverWorld::handle_events(App *app)
     // player movement real-time key presses
     player.movement = player.STOP;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-    {
         player.movement = player.RIGHT;
-    }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-    {
         player.movement = player.LEFT;
-    }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-    {
         player.movement = player.UP;
-    }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-    {
         player.movement = player.DOWN;
-    }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-    {
         player.movement = player.STOP;
-    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        player.movement = player.RIGHT_DOWN;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        player.movement = player.RIGHT_UP;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        player.movement = player.LEFT_DOWN;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        player.movement = player.LEFT_UP;
 }
 
 void OverWorld::logic(App* app)
@@ -192,28 +191,51 @@ void OverWorld::logic(App* app)
 
     // handle player movement
     b2Vec2 vel = player.player_body->GetLinearVelocity();
-    sf::Vector2f desired_vel;
-    //float desired_vel_x = 0;
-    //float desired_vel_y = 0;
-    switch(player.movement)
+    sf::Vector2f desired_vel(0,0);
+    if(player.movement == player.LEFT)
     {
-        case player.LEFT:
-            desired_vel.x += b2Max(vel.x - 0.9f, -12.0f);
-            break;
-        case player.RIGHT:
-            desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
-            break;
-        case player.UP:
-            desired_vel.y += b2Min(vel.y + 0.9f, 12.0f);
-            break;
-        case player.DOWN:
-            desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
-            break;
-        case player.STOP:
-            desired_vel.x = vel.x * 0.82; // <1, smaller value = faster stop
-            desired_vel.y = vel.y * 0.82; // <1, smaller value = faster stop
-            break;
+        desired_vel.x += b2Max(vel.x - 0.9f, -12.0f);
     }
+    else if(player.movement == player.LEFT_DOWN)
+    {
+        desired_vel.x += b2Min(vel.x - 0.9f, 12.0f);
+        //desired_vel.x = desired_vel.x / std::sqrt(2);
+        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
+        //desired_vel.y = desired_vel.y / std::sqrt(2);
+    }
+    else if(player.movement == player.LEFT_UP)
+    {
+        desired_vel.x += b2Min(vel.x - 0.9f, 12.0f);
+        desired_vel.y += b2Max(vel.y + 0.9f, 12.0f);
+    }
+    else if(player.movement == player.RIGHT)
+    {
+        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
+    }
+    else if(player.movement == player.RIGHT_DOWN)
+    {
+        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
+        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
+    }
+    else if(player.movement == player.RIGHT_UP)
+    {
+        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
+        desired_vel.y += b2Max(vel.y + 0.9f, 12.0f);
+    }
+    else if(player.movement == player.UP)
+    {
+        desired_vel.y += b2Min(vel.y + 0.9f, 12.0f);
+    }
+    else if(player.movement == player.DOWN)
+    {
+        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
+    }
+    else if(player.movement == player.STOP)
+    {
+        desired_vel.x += vel.x * 0.82; // <1, smaller value = faster stop
+        desired_vel.y += vel.y * 0.82; // <1, smaller value = faster stop
+    }
+
     float vel_change_x = desired_vel.x - vel.x;
     float vel_change_y = desired_vel.y - vel.y;
     float impulse_x = player.player_body->GetMass() * vel_change_x;
