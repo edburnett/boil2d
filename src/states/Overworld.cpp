@@ -30,8 +30,8 @@ OverWorld::OverWorld(int prevState, App* app)
     grnd.setFillColor(sf::Color(76,67,53,128));
 
     //box2d world stuff
-    b2Vec2 gravity(0, -9.8); // earth gravity is -9.8
-    //b2Vec2 gravity(0, 0); // earth gravity is -9.8
+    //b2Vec2 gravity(0, -9.8); // earth gravity is -9.8
+    b2Vec2 gravity(0, 0); // earth gravity is -9.8
     world = new b2World(gravity); // second bool sleep argument defaults to true in 2.2.1+
     world->SetAutoClearForces(false);
 
@@ -164,25 +164,22 @@ void OverWorld::handle_events(App *app)
 
     // player movement real-time key presses
     // TODO: use bools instead of an enum so multiple presses can be true at once
-    player.movement = player.STOP;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        player.movement = player.RIGHT;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        player.movement = player.LEFT;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        player.movement = player.UP;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        player.movement = player.DOWN;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        player.movement = player.STOP;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        player.movement = player.RIGHT_DOWN;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        player.movement = player.RIGHT_UP;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        player.movement = player.LEFT_DOWN;
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        player.movement = player.LEFT_UP;
+    //player.movement = player.STOP;
+    player.move_right = false;
+    player.move_left = false;
+    player.move_up = false;
+    player.move_down = false;
+    player.move_stop = false;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        player.move_right = true;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        player.move_left = true;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        player.move_up = true;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        player.move_down = true;
+    if(!player.move_right && !player.move_left && !player.move_up && !player.move_down)
+        player.move_stop = true;
 }
 
 void OverWorld::logic(App* app)
@@ -193,68 +190,46 @@ void OverWorld::logic(App* app)
     // handle player movement
     b2Vec2 vel = player.player_body->GetLinearVelocity();
     sf::Vector2f desired_vel(0,0);
-    if(player.movement == player.LEFT)
+    if(player.move_left && !player.move_right)
     {
         desired_vel.x += b2Max(vel.x - 0.9f, -12.0f);
     }
-    else if(player.movement == player.LEFT_DOWN)
-    {
-        desired_vel.x += b2Min(vel.x - 0.9f, 12.0f);
-        //desired_vel.x = desired_vel.x / std::sqrt(2);
-        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
-        //desired_vel.y = desired_vel.y / std::sqrt(2);
-    }
-    else if(player.movement == player.LEFT_UP)
-    {
-        desired_vel.x += b2Min(vel.x - 0.9f, 12.0f);
-        desired_vel.y += b2Max(vel.y + 0.9f, 12.0f);
-    }
-    else if(player.movement == player.RIGHT)
+
+    if(player.move_right && !player.move_left)
     {
         desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
     }
-    else if(player.movement == player.RIGHT_DOWN)
-    {
-        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
-        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
-    }
-    else if(player.movement == player.RIGHT_UP)
-    {
-        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
-        desired_vel.y += b2Max(vel.y + 0.9f, 12.0f);
-    }
-    else if(player.movement == player.UP)
+
+    if(player.move_up && !player.move_down)
     {
         desired_vel.y += b2Min(vel.y + 0.9f, 12.0f);
     }
-    else if(player.movement == player.DOWN)
+    if(player.move_down && !player.move_up)
     {
         desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
     }
-    else if(player.movement == player.STOP)
+    if(player.move_stop)
     {
+        // TODO: also do this if opposite keys are pressed? or switch directions? or ignore?
         desired_vel.x += vel.x * 0.82; // <1, smaller value = faster stop
         desired_vel.y += vel.y * 0.82; // <1, smaller value = faster stop
     }
 
-    // normalize. TODO: too slow. whats wrong here? constant speed? print out the values with and without this.
-    if (desired_vel.x != 0.f && desired_vel.y != 0.f)
+    double vel_change_x = desired_vel.x - vel.x;
+    double vel_change_y = desired_vel.y - vel.y;
+    double impulse_x = (player.player_body->GetMass() * vel_change_x);
+    double impulse_y = (player.player_body->GetMass() * vel_change_y);
+
+    // normalize diagonal movement
+    if (impulse_x != 0.f && impulse_y != 0.f)
     {
-        std::cout << "nonzero desired_vel" << std::endl;
-        desired_vel /= std::sqrt(2.f);
+        impulse_x /= std::sqrt(2.f);
+        impulse_y /= std::sqrt(2.f);
     }
 
-    float vel_change_x = desired_vel.x - vel.x;
-    float vel_change_y = desired_vel.y - vel.y;
-    /*
-    if (vel_change_x != 0.f && vel_change_y != 0.f)
-    {
-        vel_change_x /= std::sqrt(2.f);
-        vel_change_y /= std::sqrt(2.f);
-    }
-    */
-    float impulse_x = (player.player_body->GetMass() * vel_change_x);
-    float impulse_y = (player.player_body->GetMass() * vel_change_y);
+    //std::cout << impulse_x << impulse_y << std::endl;
+
+    // apply impulse
     player.player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player.player_body->GetWorldCenter(), true);
     
     // do physics step

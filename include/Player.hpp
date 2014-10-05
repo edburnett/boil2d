@@ -23,24 +23,11 @@ class Player : public Entity
         //b2CircleShape player_fixture;
         b2FixtureDef player_fixtureDef;
 
-        enum move_state {
-            STOP,
-            LEFT,
-            LEFT_DOWN,
-            LEFT_UP,
-            RIGHT,
-            RIGHT_DOWN,
-            RIGHT_UP,
-            UP,
-            DOWN,
-        };
-
-        bool M_LEFT = false;
-        bool M_RIGHT = false;
-        bool M_UP = false;
-        bool M_DOWN = false;
-
-        move_state movement;
+        bool move_left = false;
+        bool move_right = false;
+        bool move_up = false;
+        bool move_down = false;
+        bool move_stop = false;
 
         // player texture
         sf::Texture texture;
