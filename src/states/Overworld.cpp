@@ -188,50 +188,8 @@ void OverWorld::logic(App* app)
     player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
 
     // handle player movement
-    b2Vec2 vel = player.player_body->GetLinearVelocity();
-    sf::Vector2f desired_vel(0,0);
-    if(player.move_left && !player.move_right)
-    {
-        desired_vel.x += b2Max(vel.x - 0.9f, -12.0f);
-    }
+    player.set_position();
 
-    if(player.move_right && !player.move_left)
-    {
-        desired_vel.x += b2Min(vel.x + 0.9f, 12.0f);
-    }
-
-    if(player.move_up && !player.move_down)
-    {
-        desired_vel.y += b2Min(vel.y + 0.9f, 12.0f);
-    }
-    if(player.move_down && !player.move_up)
-    {
-        desired_vel.y += b2Max(vel.y - 0.9f, -12.0f);
-    }
-    if(player.move_stop)
-    {
-        // TODO: also do this if opposite keys are pressed? or switch directions? or ignore?
-        desired_vel.x += vel.x * 0.82; // <1, smaller value = faster stop
-        desired_vel.y += vel.y * 0.82; // <1, smaller value = faster stop
-    }
-
-    double vel_change_x = desired_vel.x - vel.x;
-    double vel_change_y = desired_vel.y - vel.y;
-    double impulse_x = (player.player_body->GetMass() * vel_change_x);
-    double impulse_y = (player.player_body->GetMass() * vel_change_y);
-
-    // normalize diagonal movement
-    if (impulse_x != 0.f && impulse_y != 0.f)
-    {
-        impulse_x /= std::sqrt(2.f);
-        impulse_y /= std::sqrt(2.f);
-    }
-
-    //std::cout << impulse_x << impulse_y << std::endl;
-
-    // apply impulse
-    player.player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player.player_body->GetWorldCenter(), true);
-    
     // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);
 
@@ -240,12 +198,6 @@ void OverWorld::logic(App* app)
 
     //player.player_shape.setRotation(player_body->GetAngle() * (180/3.14159265359));
     player.update_angle();
-
-    // do logic, collision checks, etc
-
-    // move the player etc
-
-    //std::cout << "inside ow logic loop" << std::endl;
 }
 
 void OverWorld::render(App *app, double& alpha)

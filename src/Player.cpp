@@ -50,9 +50,55 @@ Player::Player()
 
 void Player::set_position()
 {
+    // handle player movement
+    b2Vec2 vel = player_body->GetLinearVelocity();
+    sf::Vector2f desired_vel(0,0);
+    if(move_left && !move_right)
+    {
+        desired_vel.x += b2Max(vel.x - 0.9f, -15.0f);
+    }
+
+    if(move_right && !move_left)
+    {
+        desired_vel.x += b2Min(vel.x + 0.9f, 15.0f);
+    }
+
+    if(move_up && !move_down)
+    {
+        desired_vel.y += b2Min(vel.y + 0.9f, 15.0f);
+    }
+    if(move_down && !move_up)
+    {
+        desired_vel.y += b2Max(vel.y - 0.9f, -15.0f);
+    }
+    if(move_stop)
+    {
+        // TODO: also do this if opposite keys are pressed? or switch directions? or ignore?
+        desired_vel.x += vel.x * 0.82; // <1, smaller value = faster stop
+        desired_vel.y += vel.y * 0.82; // <1, smaller value = faster stop
+    }
+
+    double vel_change_x = desired_vel.x - vel.x;
+    double vel_change_y = desired_vel.y - vel.y;
+    double impulse_x = (player_body->GetMass() * vel_change_x);
+    double impulse_y = (player_body->GetMass() * vel_change_y);
+
+    // normalize diagonal movement
+    if (impulse_x != 0.f && impulse_y != 0.f)
+    {
+        impulse_x /= std::sqrt(2.f);
+        impulse_y /= std::sqrt(2.f);
+    }
+
+    //std::cout << impulse_x << impulse_y << std::endl;
+
+    // apply impulse
+    player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player_body->GetWorldCenter(), true);
+
 }
 
 void Player::update_angle()
 {
     player_shape.setRotation(-player_body->GetAngle() * (180/3.14159265359));
 }
+
