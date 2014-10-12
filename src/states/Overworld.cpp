@@ -53,7 +53,6 @@ OverWorld::OverWorld(int prevState, App* app)
     debug_draw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_centerOfMassBit | b2Draw::e_aabbBit | b2Draw::e_jointBit | b2Draw::e_pairBit);
     world->SetDebugDraw(&debug_draw);
 
-
     // box2d timestep values
     timeStep = 1.0f / 60.0f; 
     velocityIterations = 8;
@@ -81,9 +80,6 @@ void OverWorld::resume()
 
 void OverWorld::handle_events(App *app)
 {
-
-    //std::cout << "ow handle_events got called" << std::endl;
-
     sf::Event event;
     while (app->window.pollEvent(event))
     {
@@ -106,44 +102,6 @@ void OverWorld::handle_events(App *app)
             //app->window_height = event.size.height;
         }
 
-        /*
-        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Right))
-        {
-            //player.player_body->ApplyTorque(float32(-5), true);
-            
-            //b2Vec2 force = b2Vec2(1.0f, 0);
-            //b2Vec2 point = player.player_body->GetWorldCenter();
-            //player.player_body->ApplyLinearImpulse(force,point,true);
-            player.movement = player.RIGHT;
-        }
-        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Left))
-        {
-            //player.player_body->ApplyTorque(float32(5), true);
-            
-            //b2Vec2 force = b2Vec2(-1.0f, 0);
-            //b2Vec2 point = player.player_body->GetWorldCenter();
-            //player.player_body->ApplyLinearImpulse(force,point,true);
-            player.movement = player.LEFT;
-        }
-        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Up))
-        {
-            player.movement = player.UP;
-        }
-        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Down))
-        {
-            player.movement = player.DOWN;
-        }
-        if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
-        {
-            //player.player_body->ApplyTorque(float32(5), true);
-            
-            //b2Vec2 force = b2Vec2(-1.0f, 0);
-            //b2Vec2 point = player.player_body->GetWorldCenter();
-            //player.player_body->ApplyLinearImpulse(force,point,true);
-            player.movement = player.STOP;
-        }
-        */
-
         // toggle debug draw
         if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
         {
@@ -162,14 +120,13 @@ void OverWorld::handle_events(App *app)
 
     } // event loop
 
-    // player movement real-time key presses
-    // TODO: use bools instead of an enum so multiple presses can be true at once
-    //player.movement = player.STOP;
+    // reset movement bools to false
     player.move_right = false;
     player.move_left = false;
     player.move_up = false;
     player.move_down = false;
     player.move_stop = false;
+    // player movement real-time key presses
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         player.move_right = true;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -188,7 +145,10 @@ void OverWorld::logic(App* app)
     player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
 
     // handle player movement
+    app->mouse_position = sf::Mouse::getPosition(app->window);
+    //std::cout << app->mouse_position.x << "x" << app->mouse_position.y << std::endl;
     player.set_position();
+    player.update_angle(app->mouse_position);
 
     // do physics step
     world->Step(timeStep, velocityIterations, positionIterations);
@@ -196,13 +156,10 @@ void OverWorld::logic(App* app)
     // get new player position
     player.cur_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
 
-    //player.player_shape.setRotation(player_body->GetAngle() * (180/3.14159265359));
-    player.update_angle();
 }
 
 void OverWorld::render(App *app, double& alpha)
 {
-    //std::cout << "ow render got called" << std::endl;
     // clear screen and box2d force cache
     world->ClearForces();
     app->window.clear();
@@ -214,7 +171,7 @@ void OverWorld::render(App *app, double& alpha)
     float pos_x = player.cur_position.x * alpha + player.prev_position.x * (1.0f - alpha);
     float pos_y = player.cur_position.y * alpha + player.prev_position.y * (1.0f - alpha);
 
-    // position and draw the player
+    // position and draw the player shape
     player.player_shape.setPosition(pos_x, -pos_y);
     app->window.draw(player.player_shape);
 

@@ -41,7 +41,6 @@ class OverWorld : public GameState
         // create the player object
         Player player;
 
-
         // main loop functions
         void handle_events(App *app);
         void logic(App* app);

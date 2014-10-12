@@ -2,6 +2,7 @@
 #define   App_HPP_INCLUDED
 
 #include <json/json.h>
+#include <SFML/System.hpp>
 
 // App base class
 class App
@@ -24,6 +25,9 @@ class App
 
         // methods
         Json::Value get_config();
+
+        // mouse position vector
+        sf::Vector2i mouse_position;
 
         // empty destructor
         ~App(){};

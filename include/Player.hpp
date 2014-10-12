@@ -34,7 +34,7 @@ class Player : public Entity
 
         // methods
         void set_position();
-        void update_angle();
+        void update_angle(sf::Vector2i direction);
 
         ~Player(){};
 };
