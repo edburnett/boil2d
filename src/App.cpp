@@ -19,6 +19,7 @@ App::App()
     video_modes  = sf::VideoMode::getFullscreenModes();
 
     fullscreen = config.get("fullscreen", false).asBool();
+    vsync_enabled = config.get("vsync", false).asBool();
 
     // create the window
     if(fullscreen && video_modes[0].isValid())
@@ -46,10 +47,11 @@ App::App()
         window.create(sf::VideoMode(window_width, window_height, window_bpp), "boil2d", sf::Style::Resize);
     }
 
-    window.setFramerateLimit(240);
+    //window.setFramerateLimit(480);
+    window.setVerticalSyncEnabled(vsync_enabled);
 
+    // set initial state of debug_draw
     debug_draw = true;
-
 }
 
 
@@ -70,9 +72,10 @@ Json::Value App::get_config()
         std::cout << "Config file not found, initializing new one." << std::endl;
 
         // add default values
-        config["window_width"] = WINDOW_WIDTH_DEFAULT;
+        config["window_width"]  = WINDOW_WIDTH_DEFAULT;
         config["window_height"] = WINDOW_HEIGHT_DEFAULT;
-        config["fullscreen"] = false;
+        config["fullscreen"]    = false;
+        config["vsync"]         = false;
 
         std::ofstream config_file("config.json");
 

@@ -102,10 +102,10 @@ void Player::set_position()
 
 void Player::update_angle(sf::Vector2i direction)
 {
-    float shape_angle = player_body->GetAngle();
-    b2Vec2 point = b2Vec2(direction.x,direction.y);
-    b2Vec2 target = point - player_body->GetPosition();
-    float desired_angle = atan2f(-target.x, target.y);
+    //float shape_angle = player_body->GetAngle();
+    //b2Vec2 point = b2Vec2(direction.x,direction.y);
+    //b2Vec2 target = point - player_body->GetPosition();
+    //float desired_angle = atan2f(-target.x, target.y);
 
     //std::cout << shape_angle * (180/3.1459265359) << " , " << desired_angle * (180/3.1459265359) << std::endl;
 

@@ -116,11 +116,10 @@ int main()
     sf::Clock clock;
 
     //double dt = 0.01f;
-    double dt = 1.0f / 60.0f; // this is same as timeStep
+    //const double dt = 1.0f / 60.0f; // this is same as timeStep
     double alpha;
 
-    double currentTime = clock.getElapsedTime().asMilliseconds();
-    double elapsedTime = 0.0f;
+    double currentTime = clock.getElapsedTime().asSeconds();
     double accumulator = 0.0f;
 
     // get a clock for calculating fps
@@ -140,8 +139,8 @@ int main()
     // main loop here
     while(stateID != STATE_EXIT)
     {
-        double newTime = clock.getElapsedTime().asMilliseconds();
-        double frameTime = (newTime - currentTime) / 1000.0f; // remove division by 1000 if using seconds
+        double newTime = clock.getElapsedTime().asSeconds();
+        double frameTime = newTime - currentTime; // remove division by 1000 if using seconds
 
         if (frameTime > 0.55f)
             frameTime = 0.55f;
@@ -153,19 +152,22 @@ int main()
         currentState->handle_events(app);
 
         // fixed timestep update loop
-        while ( accumulator >= dt )
+        int count = 0;
+        while ( accumulator >= app->TIMESTEP )
         {
             //if (stateID != STATE_PAUSE)
             // do logic for current state
             currentState->logic(app);
 
-
             // decrement accumulator
-            accumulator -= dt;
+            accumulator -= app->TIMESTEP;
+            count += 1;
         }
 
+        std::cout << count << std::endl;
+
         // get the alpha
-        alpha = accumulator / dt;
+        alpha = accumulator / app->TIMESTEP;
 
         // change state if needed
         change_state(app);

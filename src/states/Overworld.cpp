@@ -54,9 +54,8 @@ OverWorld::OverWorld(int prevState, App* app)
     world->SetDebugDraw(&debug_draw);
 
     // box2d timestep values
-    timeStep = 1.0f / 60.0f; 
     velocityIterations = 8;
-    positionIterations = 3;
+    positionIterations = 4;
 
 }
 
@@ -142,7 +141,8 @@ void OverWorld::handle_events(App *app)
 void OverWorld::logic(App* app)
 {
     // get previous player position
-    player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+    //player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+    player.prev_position = player.cur_position;
 
     // handle player movement
     app->mouse_position = sf::Mouse::getPosition(app->window);
@@ -151,7 +151,7 @@ void OverWorld::logic(App* app)
     player.update_angle(app->mouse_position);
 
     // do physics step
-    world->Step(timeStep, velocityIterations, positionIterations);
+    world->Step(app->TIMESTEP, velocityIterations, positionIterations);
 
     // get new player position
     player.cur_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
@@ -160,19 +160,26 @@ void OverWorld::logic(App* app)
 
 void OverWorld::render(App *app, double& alpha)
 {
+
+
     // clear screen and box2d force cache
     world->ClearForces();
-    //app->window.clear();
+    app->window.clear();
 
     // draw the ground body
     app->window.draw(grnd);
 
+
     // get interpolated position
-    float pos_x = player.cur_position.x * alpha + player.prev_position.x * (1.0f - alpha);
-    float pos_y = player.cur_position.y * alpha + player.prev_position.y * (1.0f - alpha);
+    float pos_x = (player.cur_position.x * alpha) + (player.prev_position.x * (1.0f - alpha));
+    float pos_y = (player.cur_position.y * alpha) + (player.prev_position.y * (1.0f - alpha));
+
+    //std::cout << pos_x << " " << pos_y << std::endl;
 
     // position and draw the player shape
+    //player.player_shape.setPosition(pos_x, -pos_y);
     player.player_shape.setPosition(pos_x, -pos_y);
+
     app->window.draw(player.player_shape);
 
     // debug draw if option enabled
