@@ -36,6 +36,9 @@ Player::Player()
     player_bodyDef.type = b2_dynamicBody;
     sf::Vector2f db_pos = pixels_to_meters(100,0);
     player_bodyDef.position.Set(db_pos.x, db_pos.y);
+    // disable sleeping for the player
+    player_bodyDef.allowSleep = false;
+    player_bodyDef.awake = true;
 
     //player_fixture.m_p.Set(0,0);
     //player_fixture.m_radius = 0.64; // TODO: this is probably wrong! Calculate it automatically

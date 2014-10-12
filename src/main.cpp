@@ -178,7 +178,7 @@ int main()
         // calculate FPS
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
-        //std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
+        std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
     }
     // do cleanup
     clean_up(app);
