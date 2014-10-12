@@ -119,7 +119,8 @@ int main()
     double dt = 1.0f / 60.0f; // this is same as timeStep
     double alpha;
 
-    double currentTime = clock.getElapsedTime().asSeconds();
+    double currentTime = clock.getElapsedTime().asMilliseconds();
+    double elapsedTime = 0.0f;
     double accumulator = 0.0f;
 
     // get a clock for calculating fps
@@ -139,11 +140,11 @@ int main()
     // main loop here
     while(stateID != STATE_EXIT)
     {
-        double newTime = clock.getElapsedTime().asSeconds();
-        double frameTime = newTime - currentTime;
+        double newTime = clock.getElapsedTime().asMilliseconds();
+        double frameTime = (newTime - currentTime) / 1000.0f; // remove division by 1000 if using seconds
 
-        if (frameTime > 0.25)
-            frameTime = 0.25;
+        if (frameTime > 0.55f)
+            frameTime = 0.55f;
 
         currentTime = newTime;
         accumulator += frameTime;
@@ -178,7 +179,7 @@ int main()
         // calculate FPS
         double fps_time = fps_clock.restart().asSeconds();
         double fps = 1.f / (fps_time - lasttime);
-        std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
+        //std::cout << "state: " << stateID << "fps: " << fps << "  accumulator: " << accumulator << "  alpha: " << alpha << "  frameTime: " << frameTime << std::endl;
     }
     // do cleanup
     clean_up(app);
