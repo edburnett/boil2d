@@ -161,10 +161,12 @@ void OverWorld::logic(App* app)
 void OverWorld::render(App *app, double& alpha)
 {
 
+    //int random_limit = rand() % 33 + 1500;
+    //app->window.setFramerateLimit(random_limit);
 
     // clear screen and box2d force cache
-    world->ClearForces();
     app->window.clear();
+    world->ClearForces();
 
     // draw the ground body
     app->window.draw(grnd);
@@ -180,9 +182,11 @@ void OverWorld::render(App *app, double& alpha)
     //player.player_shape.setPosition(pos_x, -pos_y);
     player.player_shape.setPosition(pos_x, -pos_y);
 
-    app->window.draw(player.player_shape);
-
     // debug draw if option enabled
     if(app->debug_draw)
         world->DrawDebugData();
+
+    app->window.draw(player.player_shape);
+
+
 }

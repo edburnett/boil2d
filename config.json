@@ -1,5 +1,6 @@
 
 {
+	"fps_limit" : 0,
 	"fullscreen" : false,
 	"vsync" : false,
 	"window_height" : 540,

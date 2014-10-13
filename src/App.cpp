@@ -20,6 +20,7 @@ App::App()
 
     fullscreen = config.get("fullscreen", false).asBool();
     vsync_enabled = config.get("vsync", false).asBool();
+    fps_limit = config.get("fps_limit", 0).asInt();
 
     // create the window
     if(fullscreen && video_modes[0].isValid())
@@ -47,8 +48,19 @@ App::App()
         window.create(sf::VideoMode(window_width, window_height, window_bpp), "boil2d", sf::Style::Resize);
     }
 
-    //window.setFramerateLimit(480);
-    window.setVerticalSyncEnabled(vsync_enabled);
+    // set vsync or an fps limit
+    if(vsync_enabled)
+    {
+        window.setVerticalSyncEnabled(vsync_enabled);
+    }
+    else
+    {
+        if(fps_limit > 0 && fps_limit <= 60)
+            // minimum fps limit is 60
+            window.setFramerateLimit(60);
+        else if(fps_limit > 60)
+            window.setFramerateLimit(fps_limit);
+    }
 
     // set initial state of debug_draw
     debug_draw = true;
@@ -76,6 +88,7 @@ Json::Value App::get_config()
         config["window_height"] = WINDOW_HEIGHT_DEFAULT;
         config["fullscreen"]    = false;
         config["vsync"]         = false;
+        config["fps_limit"]     = 0;
 
         std::ofstream config_file("config.json");
 
