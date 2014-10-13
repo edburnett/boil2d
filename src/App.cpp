@@ -51,7 +51,8 @@ App::App()
     // set vsync or an fps limit
     if(vsync_enabled)
     {
-        window.setVerticalSyncEnabled(vsync_enabled);
+        // TODO still set frame limit in case vsync fails?
+        window.setVerticalSyncEnabled(true);
     }
     else
     {

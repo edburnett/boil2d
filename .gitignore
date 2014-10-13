@@ -1,4 +1,5 @@
 *.o
+*.swp
 game
 old/
 stateman*
