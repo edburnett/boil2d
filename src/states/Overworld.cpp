@@ -145,10 +145,15 @@ void OverWorld::logic(App* app)
     player.prev_position = player.cur_position;
 
     // handle player movement
-    app->mouse_position = sf::Mouse::getPosition(player.player_body->GetPosition());
+    //sf::Vector2f corrected = sf::Vector2f(app->mouse_position.x, app->mouse_position.y);
+    //sf::Vector2i mapped_coords = app->window.mapCoordsToPixel(corrected);
     //std::cout << app->mouse_position.x << "x" << app->mouse_position.y << std::endl;
     player.set_position();
+    
+    app->mouse_position = sf::Mouse::getPosition(app->window);
+    app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
     player.update_angle(app->mouse_position);
+    //player.update_angle(mapped_coords);
 
     // do physics step
     world->Step(app->TIMESTEP, velocityIterations, positionIterations);

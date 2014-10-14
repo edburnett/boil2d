@@ -38,6 +38,7 @@ class Player : public Entity
         // methods
         void set_position();
         void update_angle(sf::Vector2i direction);
+        //void update_angle(sf::Vector2i mapped_coords);
 
         ~Player(){};
 };

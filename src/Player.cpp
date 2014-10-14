@@ -100,10 +100,20 @@ void Player::set_position()
 
 }
 
+//void Player::update_angle(sf::Vector2i direction)
 void Player::update_angle(sf::Vector2i direction)
 {
     float shape_angle = player_body->GetAngle();
-    b2Vec2 point = b2Vec2(direction.x,direction.y);
+
+    // TODO refactor, clean this up, break up into functions, get rid of magic numbers, etc
+
+    float pos_x = player_shape.getPosition().x;
+    float pos_y = player_shape.getPosition().y;
+    float x = direction.x - pos_x;
+    float y = direction.y - pos_y;
+
+    //b2Vec2 point = b2Vec2(direction.x,-direction.y);
+    b2Vec2 point = b2Vec2(x,-y);
     b2Vec2 target = point - player_body->GetPosition();
     float desired_angle = atan2f(-target.x, target.y);
     float nextAngle = shape_angle + player_body->GetAngularVelocity() / 60;
