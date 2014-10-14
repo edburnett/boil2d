@@ -145,7 +145,7 @@ void OverWorld::logic(App* app)
     player.prev_position = player.cur_position;
 
     // handle player movement
-    app->mouse_position = sf::Mouse::getPosition(app->window);
+    app->mouse_position = sf::Mouse::getPosition(player.player_body->GetPosition());
     //std::cout << app->mouse_position.x << "x" << app->mouse_position.y << std::endl;
     player.set_position();
     player.update_angle(app->mouse_position);

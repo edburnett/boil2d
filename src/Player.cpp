@@ -108,11 +108,14 @@ void Player::update_angle(sf::Vector2i direction)
     float desired_angle = atan2f(-target.x, target.y);
     float nextAngle = shape_angle + player_body->GetAngularVelocity() / 60;
     float totalRotation = desired_angle - nextAngle;
-    //while(totalRotation < -180 * 
+    while(totalRotation < -180 * DEGTORAD) totalRotation += 360 * DEGTORAD;
+    while(totalRotation >  180 * DEGTORAD) totalRotation -= 360 * DEGTORAD;
+    float desiredAngularVelocity = totalRotation * 60;
+    float impulse = player_body->GetInertia() * desiredAngularVelocity;
+    player_body->ApplyAngularImpulse(impulse, true);
 
     //std::cout << shape_angle * (180/3.1459265359) << " , " << desired_angle * (180/3.1459265359) << std::endl;
 
     player_shape.setRotation(-player_body->GetAngle() * (180/3.14159265359));
-    //player_body->SetTransform(-player_body->GetPosition(), desired_angle * (180/3.14159265359));
 }
 
