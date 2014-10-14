@@ -105,7 +105,10 @@ void Player::update_angle(sf::Vector2i direction)
 {
     float shape_angle = player_body->GetAngle();
 
-    // TODO refactor, clean this up, break up into functions, get rid of magic numbers, etc
+    // TODO refactor, clean this up, break up into generic reusable functions, 
+    // get rid of magic numbers, etc. Think of multiple use cases for an
+    // engine. Code for rotating/facing a mouse pointer code could also be used 
+    // to 'lock' on to a target, ala Hotline Miami.
 
     float pos_x = player_shape.getPosition().x;
     float pos_y = player_shape.getPosition().y;

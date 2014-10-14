@@ -151,6 +151,8 @@ void OverWorld::logic(App* app)
     player.set_position();
     
     app->mouse_position = sf::Mouse::getPosition(app->window);
+    // TODO clean this up. also is mapixelToCoords necessary without a camera/view?
+    // should we just be subtracting the world coordinates from the sprite position?
     app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
     player.update_angle(app->mouse_position);
     //player.update_angle(mapped_coords);
