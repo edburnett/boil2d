@@ -10,7 +10,8 @@ machine (or state stack), fixed timestep game loop w/variable FPS and
 interpolation, menus, resource loading, config file parsing, etc.
 
 An evolving/experimental work in progress; testing & learning only at this
-point.
+point. Will be adding to this and porting generic code over from my other
+game projects as they progress.
 
 
 requirements
