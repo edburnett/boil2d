@@ -142,7 +142,7 @@ int main()
         double newTime = clock.getElapsedTime().asSeconds();
         double frameTime = newTime - currentTime; // remove division by 1000 if using seconds
 
-        if (frameTime > 0.55f)
+        if (frameTime > 0.55f) // was 0.25
             frameTime = 0.55f;
 
         currentTime = newTime;

@@ -6,16 +6,35 @@
 #include <Functions.hpp>
 #include <App.hpp>
 
-/* Base class for all moveables/entities (characters, items, etc) */ 
+#define DEGTORAD 0.0174532925199432957f
+#define RADTODEG 57.295779513082320876f
+
+
+/* Base class for all moveable sprites/entities (characters, items, etc) */ 
 class Entity
 {
     public:
         Entity();
         ~Entity(){};
 
-        // entity's position in pixels
+        // sfml sprite representing the entity
+        sf::Sprite sprite;
+        // player texture
+        sf::Texture texture;
+        // dynamic body
+        b2Body* body;
+        b2BodyDef body_def;
+        // dynamic fixture
+        b2PolygonShape fixture; 
+        b2FixtureDef fixture_def;
+
+        // entity's coordinates in pixels
         sf::Vector2f prev_position;
         sf::Vector2f cur_position;
+
+        // methods
+        void set_position();
+        void rotate_to_coords(sf::Vector2i coords);
 };
 
 #endif

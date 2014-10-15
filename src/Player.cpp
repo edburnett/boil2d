@@ -23,38 +23,38 @@ Player::Player()
     float start_pos_y = 0.0;
     cur_position = sf::Vector2f(start_pos_x, start_pos_y);
     prev_position = sf::Vector2f(start_pos_x, start_pos_y);
-    player_shape.setTexture(texture);
+    sprite.setTexture(texture);
     //player_shape.setTextureRect(sf::IntRect(0,16,64,48));
-    player_shape.setPosition(start_pos_x,start_pos_y);
+    sprite.setPosition(start_pos_x,start_pos_y);
     // set origin to center TODO turn this sort of thing into a method?
-    sf::FloatRect bounds = player_shape.getGlobalBounds();
-    player_shape.setOrigin(bounds.width/2, bounds.height/2);
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    sprite.setOrigin(bounds.width/2, bounds.height/2);
     
     //texture.setSmooth(true);
 
     // box2d dynamic body
-    player_bodyDef.type = b2_dynamicBody;
+    body_def.type = b2_dynamicBody;
     sf::Vector2f db_pos = pixels_to_meters(100,0);
-    player_bodyDef.position.Set(db_pos.x, db_pos.y);
+    body_def.position.Set(db_pos.x, db_pos.y);
     // disable sleeping for the player
-    player_bodyDef.allowSleep = false;
-    player_bodyDef.awake = true;
+    body_def.allowSleep = false;
+    body_def.awake = true;
 
     //player_fixture.m_p.Set(0,0);
     //player_fixture.m_radius = 0.64; // TODO: this is probably wrong! Calculate it automatically
     sf::Vector2f db_size = pixels_to_meters(32,16); // half-width/half-height for SetAsBox
-    player_fixture.SetAsBox(db_size.x, db_size.y);
-    player_fixtureDef.shape = &player_fixture;
-    player_fixtureDef.density = 1.0f;
-    player_fixtureDef.friction = 0.3f;
-    player_fixtureDef.restitution = 0.1f; // bounciness from 0 to 1
+    fixture.SetAsBox(db_size.x, db_size.y);
+    fixture_def.shape = &fixture;
+    fixture_def.density = 1.0f;
+    fixture_def.friction = 0.3f;
+    fixture_def.restitution = 0.1f; // bounciness from 0 to 1
 }
 
 
 void Player::set_position()
 {
     // handle player movement
-    b2Vec2 vel = player_body->GetLinearVelocity();
+    b2Vec2 vel = body->GetLinearVelocity();
     sf::Vector2f desired_vel(0,0);
     if(move_left && !move_right)
     {
@@ -83,8 +83,8 @@ void Player::set_position()
 
     double vel_change_x = desired_vel.x - vel.x;
     double vel_change_y = desired_vel.y - vel.y;
-    double impulse_x = (player_body->GetMass() * vel_change_x);
-    double impulse_y = (player_body->GetMass() * vel_change_y);
+    double impulse_x = (body->GetMass() * vel_change_x);
+    double impulse_y = (body->GetMass() * vel_change_y);
 
     // normalize diagonal movement
     if (impulse_x != 0.f && impulse_y != 0.f)
@@ -96,39 +96,6 @@ void Player::set_position()
     //std::cout << impulse_x << impulse_y << std::endl;
 
     // apply impulse
-    player_body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), player_body->GetWorldCenter(), true);
+    body->ApplyLinearImpulse(b2Vec2(impulse_x,impulse_y), body->GetWorldCenter(), true);
 
 }
-
-//void Player::update_angle(sf::Vector2i direction)
-void Player::update_angle(sf::Vector2i direction)
-{
-    float shape_angle = player_body->GetAngle();
-
-    // TODO refactor, clean this up, break up into generic reusable functions, 
-    // get rid of magic numbers, etc. Think of multiple use cases for an
-    // engine. Code for rotating/facing a mouse pointer code could also be used 
-    // to 'lock' on to a target, ala Hotline Miami.
-
-    float pos_x = player_shape.getPosition().x;
-    float pos_y = player_shape.getPosition().y;
-    float x = direction.x - pos_x;
-    float y = direction.y - pos_y;
-
-    //b2Vec2 point = b2Vec2(direction.x,-direction.y);
-    b2Vec2 point = b2Vec2(x,-y);
-    b2Vec2 target = point - player_body->GetPosition();
-    float desired_angle = atan2f(-target.x, target.y);
-    float nextAngle = shape_angle + player_body->GetAngularVelocity() / 60;
-    float totalRotation = desired_angle - nextAngle;
-    while(totalRotation < -180 * DEGTORAD) totalRotation += 360 * DEGTORAD;
-    while(totalRotation >  180 * DEGTORAD) totalRotation -= 360 * DEGTORAD;
-    float desiredAngularVelocity = totalRotation * 60;
-    float impulse = player_body->GetInertia() * desiredAngularVelocity;
-    player_body->ApplyAngularImpulse(impulse, true);
-
-    //std::cout << shape_angle * (180/3.1459265359) << " , " << desired_angle * (180/3.1459265359) << std::endl;
-
-    player_shape.setRotation(-player_body->GetAngle() * (180/3.14159265359));
-}
-

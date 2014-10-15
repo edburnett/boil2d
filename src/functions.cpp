@@ -1,8 +1,9 @@
 #include <SFML/System.hpp>
 #include <Functions.hpp>
-#define _USE_MATH_DEFINES
 #include <math.h>
 #include <iostream>
+
+#define _USE_MATH_DEFINES
 
 
 sf::Vector2f meters_to_pixels(float xMeters, float yMeters)

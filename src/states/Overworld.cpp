@@ -45,8 +45,8 @@ OverWorld::OverWorld(int prevState, App* app)
     groundBody->CreateFixture(&groundBox, 0.0f);
 
     // add player to box2d world
-    player.player_body = world->CreateBody(&player.player_bodyDef);
-    player.player_body->CreateFixture(&player.player_fixtureDef);
+    player.body = world->CreateBody(&player.body_def);
+    player.body->CreateFixture(&player.fixture_def);
 
     // debug draw
     debug_draw.LinkTarget(app->window);
@@ -153,15 +153,15 @@ void OverWorld::logic(App* app)
     app->mouse_position = sf::Mouse::getPosition(app->window);
     // TODO clean this up. also is mapixelToCoords necessary without a camera/view?
     // should we just be subtracting the world coordinates from the sprite position?
-    app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
-    player.update_angle(app->mouse_position);
+    //app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
+    player.rotate_to_coords(app->mouse_position);
     //player.update_angle(mapped_coords);
 
     // do physics step
     world->Step(app->TIMESTEP, velocityIterations, positionIterations);
 
     // get new player position
-    player.cur_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
+    player.cur_position = meters_to_pixels(player.body->GetPosition().x, player.body->GetPosition().y);
 
 }
 
@@ -187,13 +187,13 @@ void OverWorld::render(App *app, double& alpha)
 
     // position and draw the player shape
     //player.player_shape.setPosition(pos_x, -pos_y);
-    player.player_shape.setPosition(pos_x, -pos_y);
+    player.sprite.setPosition(pos_x, -pos_y);
 
     // debug draw if option enabled
     if(app->debug_draw)
         world->DrawDebugData();
 
-    app->window.draw(player.player_shape);
+    app->window.draw(player.sprite);
 
 
 }
