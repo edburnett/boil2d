@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <Functions.hpp>
 #include <App.hpp>
+#include <string>
 
 class DebugDraw : public b2Draw
 {
@@ -27,6 +28,9 @@ class DebugDraw : public b2Draw
         
         const float pixmeters,radegrees;
 
+        sf::Font font;
+        sf::Text text;
+
     public:
         DebugDraw();
         ~DebugDraw(){};
@@ -39,7 +43,8 @@ class DebugDraw : public b2Draw
         void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
         void DrawTransform(const b2Transform& xf);
         void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
-        void DrawString(int x, int y, const char* string);
+        //void DrawString(int x, int y, const char* string);
+        void DrawString(int x, int y, std::string str);
         void DrawAABB(b2AABB* aabb, const b2Color& color);
         sf::Color B2SFColor(const b2Color &color, int alpha);
         void DrawMouseJoint(b2Vec2& p1, b2Vec2& p2, const b2Color &boxColor, const b2Color &lineColor);

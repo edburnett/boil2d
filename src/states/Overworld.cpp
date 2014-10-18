@@ -140,37 +140,27 @@ void OverWorld::handle_events(App *app)
 
 void OverWorld::logic(App* app)
 {
-    // get previous player position
+    // store previous player position
     //player.prev_position = meters_to_pixels(player.player_body->GetPosition().x, player.player_body->GetPosition().y);
     player.prev_position = player.cur_position;
 
-    // handle player movement
-    //sf::Vector2f corrected = sf::Vector2f(app->mouse_position.x, app->mouse_position.y);
-    //sf::Vector2i mapped_coords = app->window.mapCoordsToPixel(corrected);
-    //std::cout << app->mouse_position.x << "x" << app->mouse_position.y << std::endl;
+    // do player movement
     player.set_position();
-    
+
+    // do rotation
     app->mouse_position = sf::Mouse::getPosition(app->window);
-    // TODO clean this up. also is mapixelToCoords necessary without a camera/view?
-    // should we just be subtracting the world coordinates from the sprite position?
-    //app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
     player.rotate_to_coords(app->mouse_position);
-    //player.update_angle(mapped_coords);
 
     // do physics step
     world->Step(app->TIMESTEP, velocityIterations, positionIterations);
 
-    // get new player position
+    // store new player position
     player.cur_position = meters_to_pixels(player.body->GetPosition().x, player.body->GetPosition().y);
 
 }
 
 void OverWorld::render(App *app, double& alpha)
 {
-
-    //int random_limit = rand() % 33 + 1500;
-    //app->window.setFramerateLimit(random_limit);
-
     // clear screen and box2d force cache
     app->window.clear();
     world->ClearForces();
@@ -178,22 +168,20 @@ void OverWorld::render(App *app, double& alpha)
     // draw the ground body
     app->window.draw(grnd);
 
-
-    // get interpolated position
+    // get player interpolated position
     float pos_x = (player.cur_position.x * alpha) + (player.prev_position.x * (1.0f - alpha));
     float pos_y = (player.cur_position.y * alpha) + (player.prev_position.y * (1.0f - alpha));
 
-    //std::cout << pos_x << " " << pos_y << std::endl;
-
-    // position and draw the player shape
-    //player.player_shape.setPosition(pos_x, -pos_y);
+    // position the player shape
     player.sprite.setPosition(pos_x, -pos_y);
 
     // debug draw if option enabled
     if(app->debug_draw)
+    {
+        debug_draw.DrawString(10,app->dd_textline,"FPS: " + std::to_string(app->fps));
         world->DrawDebugData();
+    }
 
+    // draw the player sprite to the window
     app->window.draw(player.sprite);
-
-
 }

@@ -27,6 +27,9 @@ void Entity::rotate_to_coords(sf::Vector2i coords)
     // get sprite position
     sf::Vector2f sprite_position = sprite.getPosition();
 
+    // map to view coords?
+    //app->mouse_position = sf::Vector2i(app->window.mapPixelToCoords(app->mouse_position));
+
     // convert to coords relative to sprite instead of window
     float x = coords.x - sprite_position.x;
     float y = coords.y - sprite_position.y;

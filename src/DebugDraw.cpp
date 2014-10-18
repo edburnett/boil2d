@@ -10,6 +10,15 @@ DebugDraw::DebugDraw():
 {
     AppendFlags(static_cast<uint32>(~0));
 
+    // load font for strings
+    if (!font.loadFromFile("resource/fonts/LeagueGothic-Regular.otf"))
+    {
+        std::cout << "Can't load font" << std::endl;
+    }
+
+    text.setFont(font);
+    text.setCharacterSize(16);
+    text.setColor(sf::Color(55,55,55,200));
 }
 
 void DebugDraw::LinkTarget(sf::RenderTarget& gtarget)
@@ -108,9 +117,11 @@ void DebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
 }
 
 
-void DebugDraw::DrawString(int x, int y, const char* string)
+void DebugDraw::DrawString(int x, int y, std::string str)
 {
-    //std::cout << "hit DrawString" << std::endl;
+    text.setString(str);
+    text.setPosition(x, y);
+    m_target->draw(text);
 }
 
 

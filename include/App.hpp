@@ -22,6 +22,8 @@ class App
         int window_width;
         int window_bpp;
         int fps_limit;
+        int fps;
+        int dd_textline;
         bool fullscreen;
         bool debug_draw;
         bool vsync_enabled;
