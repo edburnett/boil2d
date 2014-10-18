@@ -7,7 +7,8 @@ class Pause : public GameState
     private:
         // title screen background
         // title screen text/message
-        sf::Font font;
+        sf::Font title_font;
+        sf::Font option_font;
         sf::Text pause_title;
         sf::Text pause_menutext;
 

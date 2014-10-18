@@ -65,7 +65,7 @@ App::App()
 
     // set initial state of debug_draw
     debug_draw = true;
-    dd_textline = 5;
+    dd_textline = 10;
 }
 
 

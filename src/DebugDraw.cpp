@@ -11,14 +11,14 @@ DebugDraw::DebugDraw():
     AppendFlags(static_cast<uint32>(~0));
 
     // load font for strings
-    if (!font.loadFromFile("resource/fonts/LeagueGothic-Regular.otf"))
+    if (!font.loadFromFile("resource/fonts/minecraftia_8.ttf"))
     {
         std::cout << "Can't load font" << std::endl;
     }
 
     text.setFont(font);
-    text.setCharacterSize(16);
-    text.setColor(sf::Color(55,55,55,200));
+    text.setCharacterSize(8);
+    text.setColor(sf::Color(128,128,128,200));
 }
 
 void DebugDraw::LinkTarget(sf::RenderTarget& gtarget)

@@ -13,7 +13,12 @@
 Pause::Pause(App* app)
 {
 
-    if (!font.loadFromFile("resource/fonts/LeagueGothic-Regular.otf"))
+    if (!title_font.loadFromFile("resource/fonts/LeagueGothic-Regular.otf"))
+    {
+        std::cout << "Can't load font" << std::endl;
+    }
+
+    if (!option_font.loadFromFile("resource/fonts/minecraftia_8.ttf"))
     {
         std::cout << "Can't load font" << std::endl;
     }
@@ -24,7 +29,7 @@ Pause::Pause(App* app)
     pause_bg.setFillColor(sf::Color(0,0,0,10));
 
     // title text
-    pause_title.setFont(font);
+    pause_title.setFont(title_font);
     pause_title.setString("PAUSED");
     pause_title.setCharacterSize(200);
     pause_title.setColor(sf::Color(55,55,55));
@@ -34,9 +39,9 @@ Pause::Pause(App* app)
 
     // menu options
     sf::Text play_option;
-    play_option.setFont(font);
+    play_option.setFont(title_font);
     play_option.setString("RESUME");
-    play_option.setCharacterSize(42);
+    play_option.setCharacterSize(16);
     sf::FloatRect po_bounds = play_option.getLocalBounds();
     play_option.setOrigin(po_bounds.width/2.0f, po_bounds.height/2.0f);
     play_option.setPosition((app->window_width - play_option.getScale().x)/2.0f, (app->window_height - play_option.getScale().y)/2.0f);
@@ -44,12 +49,12 @@ Pause::Pause(App* app)
     menu_options.push_back(play_option);
 
     sf::Text exit_option;
-    exit_option.setFont(font);
+    exit_option.setFont(title_font);
     exit_option.setString("EXIT TO MENU");
-    exit_option.setCharacterSize(42);
+    exit_option.setCharacterSize(16);
     sf::FloatRect eo_bounds = exit_option.getLocalBounds();
     exit_option.setOrigin(eo_bounds.width/2.0f, eo_bounds.height/2.0f);
-    exit_option.setPosition(app->window_width/2.0f, (app->window_height/2.0f)+50.0f);
+    exit_option.setPosition(app->window_width/2.0f, (app->window_height/2.0f)+16);
     exit_option.setColor(sf::Color(155,155,155));
     menu_options.push_back(exit_option);
 

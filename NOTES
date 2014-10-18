@@ -23,3 +23,6 @@ Allow runtime toggling of the individual draw functions.
 Disallow resizing the window? As this fucks with lots of things that will
 otherwise have to be compensated for, which adds complexity. Most games seem
 to deal with this by simply requiring a restart to change resolution.
+
+Build resource loading methods in App (or use a seperate class that gets
+called from App?) for loading and handling fonts, sprites, textures, etc.
